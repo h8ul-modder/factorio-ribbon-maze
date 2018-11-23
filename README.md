@@ -2,6 +2,9 @@
 
 The maze itself is destined to be automated.
 
+Ribbon Maze challenges you to explore a maze in search of rich resources. The maze is impassable, but new late game
+technologies let you terraform the maze...
+
 ## Key features
 
 * **Perfect maze** - only one right path takes you deeper into a practically infinite maze. But...
