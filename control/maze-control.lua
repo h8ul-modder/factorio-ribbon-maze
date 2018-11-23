@@ -142,7 +142,6 @@ local function ensureResource(config, surface, modSurfaceInfo, chunksX, chunksY,
             end
         end
     end
-    error(resource .. " could be placed in 32 chunks")
 end
 
 local function initModSurfaceInfo(config, surface, modSurfaceInfo)
@@ -154,23 +153,27 @@ local function initModSurfaceInfo(config, surface, modSurfaceInfo)
     modSurfaceInfo.mazeInfo = {}
 
     local width
-    local height
 
     -- swap X/Y for the purposes of maze position calculation, depending upon which direction is larger
     if surface.map_gen_settings.height < surface.map_gen_settings.width then
         width = surface.map_gen_settings.height
-        height = surface.map_gen_settings.width
         modSurfaceInfo.mazeInfo.swapXY = true
     else
         width = surface.map_gen_settings.width
-        height = surface.map_gen_settings.height
         modSurfaceInfo.mazeInfo.swapXY = false
+    end
+
+    if width < 160 then
+        error('Maze too narrow, please pick a width or height of at least 160')
     end
 
     if width <= 0 or width >= 2000000 then
         width = config.mazeDefaultWidthChunks * 32
     elseif width > config.mazeMaxWidthChunks * 32 then
         width = config.mazeMaxWidthChunks * 32
+    else
+        -- ignore a chunk either side on a finite map so that we don't get out-of-map in the maze
+        width = width - 64
     end
 
     local chunks = (width - width % 32) / 32
@@ -178,7 +181,12 @@ local function initModSurfaceInfo(config, surface, modSurfaceInfo)
     if chunks % 2 == 0 then
         chunks = chunks + 1
     end
-    modSurfaceInfo.mapOffset = (chunks-1) / 2
+    -- to start in the middle we need an odd number of chunks either side; if we don't have that then start off-centre
+    if ((chunks - 1)/2) % 2 == 0 then
+        modSurfaceInfo.mapOffset = (chunks-1) / 2
+    else
+        modSurfaceInfo.mapOffset = (chunks+1) / 2
+    end
 
     local mazeRng = Cmwc.deriveNew(modSurfaceInfo.masterRng)
 
@@ -312,6 +320,8 @@ function chunkGeneratedEventHandler(event)
             local replacement = config.waterTileReplacement[tile.name]
             if replacement then
                 table.insert(updatedTiles, {name = replacement, position = {tileX, tileY}})
+            elseif tile.name == 'out-of-map' then
+                table.insert(updatedTiles, {name = "red-desert-0", position = {tileX, tileY}})
             end
         end
     end
