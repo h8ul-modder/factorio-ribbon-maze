@@ -66,7 +66,7 @@ mangroveHarvesterLayers[1].hr_version.animation_speed = animation_speed
 mangroveHarvesterLayers[1].run_mode = run_mode
 mangroveHarvesterLayers[1].hr_version.run_mode = run_mode
 
-mangroveHarvesterLayers[1].scale = scale
+mangroveHarvesterLayers[1].scale = scale * 2
 mangroveHarvesterLayers[1].hr_version.scale = scale
 
 mangroveHarvesterLayers[1].tint = tint

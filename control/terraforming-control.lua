@@ -105,7 +105,7 @@ end
 function mazeTerraformingArtillerybuiltHandler(event)
     local entity = event.created_entity
 
-    if entity.name == "maze-terraforming-artillery-turret" then
+    if entity.name == "maze-terraforming-artillery-turret" or entity.name == "maze-terraforming-artillery-wagon" then
         entity.force = "maze-terraforming-artillery"
     end
 end

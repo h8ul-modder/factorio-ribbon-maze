@@ -400,16 +400,6 @@ function playerCreatedEventHander(event)
             player.force.chart(surface, {{firstResourceX, firstResourceY}, {firstResourceX+31, firstResourceY+31}})
         end
     end
-
-    player.cheat_mode=true
-    for name, recipe in pairs(player.force.recipes) do recipe.enabled = true end
-    player.force.chart(surface,
-        {{player.position.x - (16+modSurfaceInfo.mapOffset*32), player.position.y - 200},
-            {player.position.x + (16+modSurfaceInfo.mapOffset*32), player.position.y + 200}})
-    player.force.chart(surface,
-        {{player.position.x - 400, player.position.y - (16 + 32 * 100)},
-            {player.position.x + 400, player.position.y + 16}})
-
 end
 
 function initHandler()

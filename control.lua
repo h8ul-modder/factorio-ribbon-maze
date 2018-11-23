@@ -96,12 +96,12 @@ function ribbonMazeConfig()
         ["crude-oil"] = {
             fallbackY = 9,
             maxY = 32,
-            reveal = settingsGlobal["ribbon-maze-chart-nearby-crude-oil"],
+            reveal = settingsGlobal["ribbon-maze-chart-nearby-crude-oil"].value,
         },
         ["uranium-ore"] = {
             fallbackY = 17,
             maxY = 32,
-            reveal = settingsGlobal["ribbon-maze-chart-nearby-uranium-ore"],
+            reveal = settingsGlobal["ribbon-maze-chart-nearby-uranium-ore"].value,
         },
     }
 

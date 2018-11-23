@@ -30,10 +30,11 @@ data:extend{{
     }},
     effects =
     {
-        {
-            type = "unlock-recipe",
-            recipe = "maze-terraforming-artillery-wagon"
-        },
+-- wagon does not fire (probably due to the loco's force), so disabling for now
+--        {
+--            type = "unlock-recipe",
+--            recipe = "maze-terraforming-artillery-wagon"
+--        },
         {
             type = "unlock-recipe",
             recipe = "maze-terraforming-artillery-turret"
