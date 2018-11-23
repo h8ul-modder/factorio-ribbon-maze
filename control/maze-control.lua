@@ -28,9 +28,9 @@ local function calculateMazePosition(modSurfaceInfo, coordinates)
     local topX
     local topY
 
-    if modSurfaceInfo.swapXY then
+    if modSurfaceInfo.mazeInfo.swapXY then
         topX = coordinates.y
-        topY = coordinates.x
+        topY = -coordinates.x
     else
         topX = coordinates.x
         topY = coordinates.y
@@ -47,8 +47,8 @@ local function calculateChunkPositionFromMazeCoordinates(modSurfaceInfo, mazeCoo
     local topX = (mazeCoordinates.x - (1 + modSurfaceInfo.mapOffset)) * 32
     local topY = -(mazeCoordinates.y - 1) * 32
 
-    if modSurfaceInfo.swapXY then
-        return {x = topY, y = topX}
+    if modSurfaceInfo.mazeInfo.swapXY then
+        return {x = topY, y = -topX}
     else
         return {x = topX, y = topY}
     end
@@ -277,23 +277,44 @@ function chunkGeneratedEventHandler(event)
 
         if config.terraformingPrototypesEnabled then
             if tileName == config.waterTile then
-
-                for tileX = chunkArea.left_top.x+1, chunkArea.left_top.x+30 do
-                    for tileY = chunkArea.left_top.y-1, chunkArea.left_top.y do
-                        local randMangrove = Cmwc.randFraction(modSurfaceInfo.firstMazeRowMangroveRng[x])
-                        if randMangrove > 0.4 then
-                            surface.create_entity{name="mangrove-rhizophora", position={tileX,tileY}}
+                if modSurfaceInfo.mazeInfo.swapXY then
+                    for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+30 do
+                        for tileX = chunkArea.left_top.x+32, chunkArea.left_top.x+33 do
+                            local randMangrove = Cmwc.randFraction(modSurfaceInfo.firstMazeRowMangroveRng[x])
+                            if randMangrove > 0.4 then
+                                surface.create_entity{name="mangrove-rhizophora", position={tileX,tileY}}
+                            end
                         end
                     end
-                end
 
-                for tileX = chunkArea.left_top.x+1, chunkArea.left_top.x+30 do
-                    for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+2 do
-                        local randMangrove = Cmwc.randFraction(modSurfaceInfo.firstMazeRowMangroveRng[x])
-                        if randMangrove > 0.9 then
-                            surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
-                        elseif randMangrove > 0.5 then
-                            surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                    for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+30 do
+                        for tileX = chunkArea.left_top.x+30, chunkArea.left_top.x+31 do
+                            local randMangrove = Cmwc.randFraction(modSurfaceInfo.firstMazeRowMangroveRng[x])
+                            if randMangrove > 0.9 then
+                                surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
+                            elseif randMangrove > 0.5 then
+                                surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                            end
+                        end
+                    end
+                else
+                    for tileX = chunkArea.left_top.x+1, chunkArea.left_top.x+30 do
+                        for tileY = chunkArea.left_top.y-1, chunkArea.left_top.y do
+                            local randMangrove = Cmwc.randFraction(modSurfaceInfo.firstMazeRowMangroveRng[x])
+                            if randMangrove > 0.4 then
+                                surface.create_entity{name="mangrove-rhizophora", position={tileX,tileY}}
+                            end
+                        end
+                    end
+
+                    for tileX = chunkArea.left_top.x+1, chunkArea.left_top.x+30 do
+                        for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+2 do
+                            local randMangrove = Cmwc.randFraction(modSurfaceInfo.firstMazeRowMangroveRng[x])
+                            if randMangrove > 0.9 then
+                                surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
+                            elseif randMangrove > 0.5 then
+                                surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                            end
                         end
                     end
                 end
