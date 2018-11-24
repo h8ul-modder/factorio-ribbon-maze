@@ -433,6 +433,47 @@ function playerCreatedEventHander(event)
     end
 end
 
+local function resourceScanning(research, resourceName)
+    local config = ribbonMazeConfig()
+    local maxY
+    if config.ensureResources[resourceName] then
+        maxY = config.ensureResources[resourceName].maxY
+    else
+        maxY = 32
+    end
+
+    local force = research.force
+    for _,surfaceName in pairs(config.modSurfaces) do
+        local surface = game.surfaces[surfaceName]
+        if surface then
+            local modSurfaceInfo = global.modSurfaceInfo[surfaceName]
+            if modSurfaceInfo then
+                for findY = 1, maxY, 2 do
+                    for findX = 1, modSurfaceInfo.maze.numColumns, 2 do
+                        local coordinates = {x=findX, y=findY}
+                        local resource = resourceAt(config, surface, modSurfaceInfo, coordinates)
+                        if resource and resource.resourceName == resourceName then
+                            local resourcePos = calculateChunkPositionFromMazeCoordinates(modSurfaceInfo, coordinates)
+                            local resourceX = resourcePos.x
+                            local resourceY = resourcePos.y
+                            force.chart(surface, {{resourceX, resourceY}, {resourceX+31, resourceY+31}})
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+function resourceFinishedEventHandler(event)
+    local research = event.research
+    if research and research.name == "oil-scanning" then
+        resourceScanning(research, "crude-oil")
+    elseif research and research.name == "uranium-scanning" then
+        resourceScanning(research, "uranium-ore")
+    end
+end
+
 function initHandler()
 
     local config = ribbonMazeConfig()

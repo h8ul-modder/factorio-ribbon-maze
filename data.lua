@@ -20,6 +20,10 @@
    SOFTWARE.
 --]]
 
+-- maze scanning
+require('prototypes.technology.oil-scanning')
+require('prototypes.technology.uranium-scanning')
+
 -- mangroves
 
 require('prototypes.categories.mangrove')

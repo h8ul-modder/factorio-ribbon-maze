@@ -176,6 +176,7 @@ script.on_init(initHandler)
 
 script.on_event(defines.events.on_player_created, playerCreatedEventHander)
 script.on_event(defines.events.on_chunk_generated, chunkGeneratedEventHandler)
+script.on_event(defines.events.on_research_finished, resourceFinishedEventHandler)
 
 ------------------------------------------------------------
 -- Require and register the terraforming control handlers --
