@@ -37,6 +37,7 @@ require('prototypes.resource.mangrove')
 require('prototypes.entity.mangrove-harvester')
 require('prototypes.item.mangrove-harvester')
 require('prototypes.recipe.mangrove-harvester')
+require('prototypes.technology.mangrove-harvesting')
 
 -- compost
 

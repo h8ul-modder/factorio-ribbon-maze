@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.6.4
+Date: 24. 11. 2018
+  Fixes:
+    - Mangrove harvester was unlocked at start, rather than requiring technology
+---------------------------------------------------------------------------------------------------
+Version: 0.6.3
+Date: 24. 11. 2018
+  Enhancement:
+    - New technologies, oil scanning and uranium scanning, reveal resources on the map
+ ---------------------------------------------------------------------------------------------------
+ Version: 0.6.2
+ Date: 24. 11. 2018
+   Fixes:
+     - Better handling finite width/height in map generation settings, including running maze
+     left-to-right by limiting the height.
+---------------------------------------------------------------------------------------------------
+Version: 0.6.1
+Date: 24. 11. 2018
+  First public release

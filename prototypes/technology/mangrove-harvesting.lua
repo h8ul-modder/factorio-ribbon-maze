@@ -24,24 +24,20 @@ data:extend{{
     type = "technology",
     name = "mangrove-harvesting",
     icon_size = 128,
-    icons = {{
-        icon = "__base__/graphics/technology/tanks.png",
-        tint = {r=0.41, g=0.8, b=0.41, a=0.5},
-    }},
+    icons = {
+        {
+            icon = "__base__/graphics/technology/tanks.png",
+        },
+        {
+            icon = "__RibbonMaze__/graphics/technology/mangrove-harvesting.png",
+        }
+    },
     effects =
     {
         {
             type = "unlock-recipe",
-            recipe = "maze-terraforming-artillery-wagon"
-        },
-        {
-            type = "unlock-recipe",
-            recipe = "maze-terraforming-artillery-turret"
-        },
-        {
-            type = "unlock-recipe",
-            recipe = "maze-terraforming-artillery-shell"
-        },
+            recipe = "mangrove-harvester"
+        }
     },
     prerequisites = {"tanks", "wood-kiln-drying"},
     unit =

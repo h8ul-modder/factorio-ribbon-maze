@@ -24,6 +24,7 @@ data:extend{{
     type = "recipe",
     name = "mangrove-harvester",
     energy_required = 2,
+    enabled = false,
     ingredients = {
         {"burner-mining-drill", 1},
         {"tank", 1},
