@@ -1,20 +1,33 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.6.5
+Date: 25. 11. 2018
+  Major Features:
+    - New setting: Clear start chunks. Can be used to clear an area near the start to make more room to build. Recommend a value of at least 1 if using AAI Industries, for the shipwreck. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/7)
+  Bugfixes:
+    - Player can collide with entity at spawn. https://github.com/h8ul-modder/factorio-ribbon-maze/issues/9
+    - Changelog not appearing in-game. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/6)
+---------------------------------------------------------------------------------------------------
 Version: 0.6.4
 Date: 24. 11. 2018
-  Fixes:
-    - Mangrove harvester was unlocked at start, rather than requiring technology
+  Bugfixes:
+    - Mangrove harvester was unlocked at start, rather than requiring technology. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/5)
 ---------------------------------------------------------------------------------------------------
 Version: 0.6.3
 Date: 24. 11. 2018
-  Enhancement:
-    - New technologies, oil scanning and uranium scanning, reveal resources on the map
- ---------------------------------------------------------------------------------------------------
- Version: 0.6.2
- Date: 24. 11. 2018
-   Fixes:
-     - Better handling finite width/height in map generation settings, including running maze
-     left-to-right by limiting the height.
+  Features:
+    - New technologies, oil scanning and uranium scanning, reveal resources on the map. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/4)
 ---------------------------------------------------------------------------------------------------
-Version: 0.6.1
-Date: 24. 11. 2018
-  First public release
+Version: 0.6.2
+Date: 23. 11. 2018
+  Bugfixes:
+    - Better handling finite width/height in map generation settings, including running maze left-to-right by limiting the height. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/3)
+---------------------------------------------------------------------------------------------------
+Version: 0.6.1 - First public release
+Date: 23. 11. 2018
+  Major Features:
+    - Perfect procedurally generated maze
+    - Resource rewards at dead ends
+    - Mixed ores near start
+    - New infinite resource: mangroves
+    - Terraforming technology chain and recipes
+    - New achievements for wood production and terraforming

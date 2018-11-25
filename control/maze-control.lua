@@ -54,7 +54,28 @@ local function calculateChunkPositionFromMazeCoordinates(modSurfaceInfo, mazeCoo
     end
 end
 
+local function isInClearMazeArea(config, modSurfaceInfo, x, y)
+    if config.clearMazeStartChunks <= 0 then
+        return false
+    end
+
+    local distanceFromOriginX
+    if ((modSurfaceInfo.maze.numColumns - 1)/2) % 2 == 0 then
+        distanceFromOriginX = x - ((modSurfaceInfo.maze.numColumns-1)/2)
+    else
+        distanceFromOriginX = x - ((modSurfaceInfo.maze.numColumns+1)/2)
+    end
+    if distanceFromOriginX < 0 then
+        distanceFromOriginX = -distanceFromOriginX
+    end
+    return y <= config.clearMazeStartChunks+1 and distanceFromOriginX < config.clearMazeStartChunks+1
+end
+
 local function calculateResource(config, surface, modSurfaceInfo, x, y)
+
+    if isInClearMazeArea(config, modSurfaceInfo, x, y) then
+        return
+    end
 
     local deadEnd = Maze.deadEnd(modSurfaceInfo.maze, x, y)
     if deadEnd.corridorLength == 0 then
@@ -259,10 +280,13 @@ function chunkGeneratedEventHandler(event)
         return
     end
 
-    if Maze.wallTileAt(modSurfaceInfo.maze, x, y) then
+    local inClearMazeArea = isInClearMazeArea(config, modSurfaceInfo, x, y)
+    local isWaterRow = y < 1
+
+    if (isWaterRow or not inClearMazeArea) and Maze.wallTileAt(modSurfaceInfo.maze, x, y) then
         local updatedTiles = {}
         local tileName
-        if y < 1 and not Maze.wallTileAt(modSurfaceInfo.maze, x, y+1) then
+        if isWaterRow and (inClearMazeArea or not Maze.wallTileAt(modSurfaceInfo.maze, x, y+1)) then
             tileName = config.waterTile
         else
             tileName = config.mazeWallTile
@@ -275,7 +299,7 @@ function chunkGeneratedEventHandler(event)
         end
         surface.set_tiles(updatedTiles)
 
-        if config.terraformingPrototypesEnabled then
+        if config.terraformingPrototypesEnabled and modSurfaceInfo.firstMazeRowMangroveRng[x] then
             if tileName == config.waterTile then
                 if modSurfaceInfo.mazeInfo.swapXY then
                     for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+30 do
@@ -333,8 +357,6 @@ function chunkGeneratedEventHandler(event)
 
     local updatedTiles = {}
 
-    local resource = resourceAt(config, surface, modSurfaceInfo, mazePosition)
-
     for tileX = chunkArea.left_top.x, chunkArea.left_top.x+31 do
         for tileY = chunkArea.left_top.y, chunkArea.left_top.y+31 do
             local tile = surface.get_tile(tileX, tileY)
@@ -348,6 +370,12 @@ function chunkGeneratedEventHandler(event)
     end
 
     surface.set_tiles(updatedTiles)
+
+    if inClearMazeArea then
+        return
+    end
+
+    local resource = resourceAt(config, surface, modSurfaceInfo, mazePosition)
 
     if resource and resource.resourceName then
 
@@ -421,7 +449,15 @@ function playerCreatedEventHander(event)
     end
     initModSurfaceInfo(config, surface, modSurfaceInfo)
 
-    player.teleport({x = 16, y = 16}, surface)
+    if config.clearMazeStartChunks <= 0 then
+
+        local teleportPosition = surface.find_non_colliding_position("player", {x = 16, y = 16}, 16, 1)
+        if teleportPosition then
+            player.teleport(teleportPosition, surface)
+        else
+            player.teleport({x = 16, y = 16}, surface)
+        end
+    end
 
     for k,v in pairs(config.ensureResources) do
         if v.reveal and modSurfaceInfo.firstResource[k] then

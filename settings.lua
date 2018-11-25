@@ -21,6 +21,12 @@
 --]]
 
 data:extend{
+    {
+        type = "int-setting",
+        name = "ribbon-maze-clear-start",
+        setting_type = "runtime-global",
+        default_value = 0
+    },
 
     {
         type = "bool-setting",

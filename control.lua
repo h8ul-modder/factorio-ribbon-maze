@@ -105,6 +105,8 @@ function ribbonMazeConfig()
         },
     }
 
+    local clearMazeStartChunks = settingsGlobal["ribbon-maze-clear-start"].value
+
     local config = {
         -- True if terraforming prototypes are available, in which case entities and forces will be created to allow
         -- automated terraforming with artillery
@@ -150,7 +152,10 @@ function ribbonMazeConfig()
         -- created in a corridor of length 10 will always be uranium. After that, it is random. Resources are always
         -- calcuated in order rom bottom-left to top-right.
         resourceMatrix = RESOURCE_MATRIX,
-        resourceMatrixMax = RESOURCE_MATRIX_MAX
+        resourceMatrixMax = RESOURCE_MATRIX_MAX,
+
+        -- Creates a clear maze of this many chunks
+        clearMazeStartChunks = clearMazeStartChunks,
     }
 
     return config
