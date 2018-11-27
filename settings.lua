@@ -25,7 +25,8 @@ data:extend{
         type = "int-setting",
         name = "ribbon-maze-clear-start",
         setting_type = "runtime-global",
-        default_value = 0
+        default_value = 0,
+        order="rb-a",
     },
 
     {
@@ -33,49 +34,76 @@ data:extend{
         name = "ribbon-maze-chart-nearby-crude-oil",
         setting_type = "runtime-global",
         default_value = false
+        ,
+        order="rb-b",
     },
     {
         type = "bool-setting",
         name = "ribbon-maze-chart-nearby-uranium-ore",
         setting_type = "runtime-global",
-        default_value = false
+        default_value = false,
+        order="rb-c",
+    },
+
+    {
+        type = "int-setting",
+        name = "ribbon-maze-mixed-patchwork-min",
+        setting_type = "runtime-global",
+        default_value = 1,
+        allowed_values = {1,2,3,5,6,10,15},
+        order="rb-d",
+    },
+
+    {
+        type = "int-setting",
+        name = "ribbon-maze-mixed-patchwork-max",
+        setting_type = "runtime-global",
+        default_value = 15,
+        allowed_values = {1,2,3,5,6,10,15},
+        order="rb-e",
     },
 
     {
         type = "bool-setting",
         name = "ribbon-maze-stone",
         setting_type = "runtime-global",
-        default_value = true
+        default_value = true,
+        order="rb-f",
     },
     {
         type = "bool-setting",
         name = "ribbon-maze-coal",
         setting_type = "runtime-global",
-        default_value = true
+        default_value = true,
+        order="rb-g",
     },
     {
         type = "bool-setting",
         name = "ribbon-maze-copper-ore",
         setting_type = "runtime-global",
-        default_value = true
+        default_value = true,
+        order="rb-h",
     },
     {
         type = "bool-setting",
         name = "ribbon-maze-iron-ore",
         setting_type = "runtime-global",
-        default_value = true
+        default_value = true,
+        order="rb-i",
     },
     {
         type = "bool-setting",
         name = "ribbon-maze-uranium-ore",
         setting_type = "runtime-global",
-        default_value = true
+        default_value = true,
+        order="rb-j",
     },
     {
         type = "bool-setting",
         name = "ribbon-maze-crude-oil",
         setting_type = "runtime-global",
-        default_value = true
+        default_value = true,
+        order="rb-k",
     },
 }
 

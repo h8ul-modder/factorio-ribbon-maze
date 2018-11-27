@@ -62,6 +62,7 @@ function ribbonMazeConfig()
 
     local resources = {}
     local mixedResources = {}
+    local forcedMixedResources = {}
 
     if settingsGlobal["ribbon-maze-iron-ore"].value then
         resources["iron-ore"] = true
@@ -69,21 +70,25 @@ function ribbonMazeConfig()
         table.insert(mixedResources, "iron-ore")
         table.insert(mixedResources, "iron-ore")
         table.insert(mixedResources, "iron-ore")
+        table.insert(forcedMixedResources, "iron-ore")
     end
     if settingsGlobal["ribbon-maze-copper-ore"].value then
         resources["copper-ore"] = true
         table.insert(mixedResources, "copper-ore")
         table.insert(mixedResources, "copper-ore")
         table.insert(mixedResources, "copper-ore")
+        table.insert(forcedMixedResources, "copper-ore")
     end
     if settingsGlobal["ribbon-maze-coal"].value then
         resources["coal"] = true
         table.insert(mixedResources, "coal")
         table.insert(mixedResources, "coal")
+        table.insert(forcedMixedResources, "coal")
     end
     if settingsGlobal["ribbon-maze-stone"].value then
         resources["stone"] = true
         table.insert(mixedResources, "stone")
+        table.insert(forcedMixedResources, "stone")
     end
     if settingsGlobal["ribbon-maze-crude-oil"].value then
         resources["crude-oil"] = true
@@ -104,6 +109,12 @@ function ribbonMazeConfig()
             reveal = settingsGlobal["ribbon-maze-chart-nearby-uranium-ore"].value,
         },
     }
+
+    local minMixedResourcesPatchworkSize =  settingsGlobal["ribbon-maze-mixed-patchwork-min"].value
+    local maxMixedResourcesPatchworkSize =  settingsGlobal["ribbon-maze-mixed-patchwork-max"].value
+    if maxMixedResourcesPatchworkSize < minMixedResourcesPatchworkSize then
+        maxMixedResourcesPatchworkSize = minMixedResourcesPatchworkSize
+    end
 
     local clearMazeStartChunks = settingsGlobal["ribbon-maze-clear-start"].value
 
@@ -144,6 +155,9 @@ function ribbonMazeConfig()
         -- Mixed ores near start are picked randomly from this array; duplicate entries increase a resource's
         -- odds of being picked.
         mixedResources = mixedResources,
+        forcedMixedResources = forcedMixedResources,
+        minMixedResourcesPatchworkSize = minMixedResourcesPatchworkSize,
+        maxMixedResourcesPatchworkSize = maxMixedResourcesPatchworkSize,
 
         -- The resource matrix controls which resources can be picked at a given length of corridor (i.e. a length of
         -- maze with no junctions; bends are ok though). Only even numbers are possible. Corridor length calcuation is

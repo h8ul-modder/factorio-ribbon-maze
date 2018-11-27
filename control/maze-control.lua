@@ -379,25 +379,50 @@ function chunkGeneratedEventHandler(event)
 
     if resource and resource.resourceName then
 
+        local resourceName = resource.resourceName
+
         local chunkRandomAdjustment = Cmwc.randFractionRange(modSurfaceInfo.resourceGridRng, resource.minRand, 1.0)
 
         local cumulativeOil = 0
 
+        local mixedBag
+        local patchworkSize
+        if resourceName == "mixed_" then
+            mixedBag = {table.unpack(config.forcedMixedResources) }
+            if config.minMixedResourcesPatchworkSize ~= config.maxMixedResourcesPatchworkSize then
+
+                local mixedResourcesPatchworkSizes = {}
+                for p = config.minMixedResourcesPatchworkSize, config.maxMixedResourcesPatchworkSize do
+                    if 30 % p == 0 then
+                        table.insert(mixedResourcesPatchworkSizes, p)
+                    end
+                end
+
+                local patchworkSizeIndex = Cmwc.randRange(modSurfaceInfo.resourceGridRng, 1, #mixedResourcesPatchworkSizes)
+                patchworkSize = mixedResourcesPatchworkSizes[patchworkSizeIndex]
+            else
+                patchworkSize = config.minMixedResourcesPatchworkSize
+            end
+        end
+
         for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+30 do
 
             local crudeOilOffset = 0
-            if resource.resourceName == "crude-oil" and Cmwc.randFraction(modSurfaceInfo.resourceGridRng) > 0.5 then
+            if resourceName == "crude-oil" and Cmwc.randFraction(modSurfaceInfo.resourceGridRng) > 0.5 then
                 crudeOilOffset = 1
             end
 
             for tileX = chunkArea.left_top.x+1, chunkArea.left_top.x+30 do
 
                 local resourceName = resource.resourceName
-                local placementCoinToss = Cmwc.randFraction(modSurfaceInfo.resourceGridRng)
-                local tileRandomAdjustment = Cmwc.randFractionRange(modSurfaceInfo.resourceGridRng, resource.minRand, 1.0)
-                local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
 
-                if resource.resourceName == "crude-oil" then
+                if resourceName == "crude-oil" then
+
+                    local tileRandomAdjustment = Cmwc.randFractionRange(modSurfaceInfo.resourceGridRng, resource.minRand, 1.0)
+                    local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
+
+                    local placementCoinToss = Cmwc.randFraction(modSurfaceInfo.resourceGridRng)
+
                     if tileX-chunkArea.left_top.x < 2 or (tileX+crudeOilOffset) % 2 == 0 or tileY % 2 == 0 or placementCoinToss < 0.75 then
                         amount = 0
                     end
@@ -416,18 +441,50 @@ function chunkGeneratedEventHandler(event)
                     end
                 else
                     if resourceName == "mixed_" then
-                        local randomOre = Cmwc.randRange(resource.rng, 1, #config.mixedResources)
-                        resourceName = config.mixedResources[randomOre]
-                    end
 
-                    if resourceName and amount >= 10 then
-                        surface.create_entity{
+                        local moduloX = (tileX-(chunkArea.left_top.x+1)) % patchworkSize
+                        local moduloY = (tileY-(chunkArea.left_top.y+1)) % patchworkSize
+                        if (moduloX == 0 and moduloY == 0) then
+                            local randomOre
+                            if #mixedBag > 0 then
+                                local randomOreIndex = Cmwc.randRange(resource.rng, 1, #mixedBag)
+                                randomOre = mixedBag[randomOreIndex]
+                                table.remove(mixedBag, randomOreIndex)
+                            else
+                                local randomOreIndex = Cmwc.randRange(resource.rng, 1, #config.mixedResources)
+                                randomOre = config.mixedResources[randomOreIndex]
+                            end
+
+                            for randomOreX=tileX,tileX+patchworkSize-1 do
+                                for randomOreY=tileY,tileY+patchworkSize-1 do
+
+                                    local tileRandomAdjustment = Cmwc.randFractionRange(modSurfaceInfo.resourceGridRng, resource.minRand, 1.0)
+                                    local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
+
+                                    surface.create_entity{
+                                        name=randomOre,
+                                        amount=amount,
+                                        initial_amount=amount,
+                                        position={randomOreX, randomOreY},
+                                        enable_tree_removal=true,
+                                        enable_cliff_removal=true}
+                                end
+                            end
+                        end
+                    else
+                        local tileRandomAdjustment = Cmwc.randFractionRange(modSurfaceInfo.resourceGridRng, resource.minRand, 1.0)
+                        local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
+
+                        if resourceName and amount >= 10 then
+
+                            surface.create_entity{
                             name=resourceName,
                             amount=amount,
                             initial_amount=amount,
                             position={tileX, tileY},
                             enable_tree_removal=true,
-                            enable_cliff_removal=true}
+                            enable_cliff_removal=true }
+                        end
                     end
                 end
             end
