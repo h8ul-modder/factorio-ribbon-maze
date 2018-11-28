@@ -61,7 +61,7 @@ end
 
 function mazeTerraformingResultHandler(event)
 
-    local config = terraformingConfig()
+    local config = ribbonMazeConfig()
 
     if event.entity.name == "maze-terraforming-result" then
         local surface = event.entity.surface

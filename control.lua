@@ -20,42 +20,44 @@
    SOFTWARE.
 --]]
 
+local cachedRibbonMazeConfig
+
 --------------------------------------------------------
 -- Configure fixed constants, and proxy any settings ---
 --------------------------------------------------------
 
-local WATER_TILE_REPLACEMENT = {}
-WATER_TILE_REPLACEMENT["water"] = "red-desert-0"
-WATER_TILE_REPLACEMENT["water-green"] = "red-desert-1"
-WATER_TILE_REPLACEMENT["deepwater"] = "red-desert-2"
-WATER_TILE_REPLACEMENT["deepwater-green"] = "red-desert-3"
+local function createRibbonMazeConfig()
 
-local RESOURCE_MATRIX = {}
-RESOURCE_MATRIX[2] = {
-    "iron-ore",
-    "copper-ore",
-    "coal",
-    "stone",
-}
-RESOURCE_MATRIX[4] = {
-    "coal",
-    "iron-ore",
-}
-RESOURCE_MATRIX[6] = {
-    "copper-ore",
-    "stone",
-}
-RESOURCE_MATRIX[8] = {
-    "crude-oil",
-}
-RESOURCE_MATRIX[10] = {
-    "uranium-ore",
-    "crude-oil",
-    "iron-ore",
-}
-local RESOURCE_MATRIX_MAX = 10
+    local WATER_TILE_REPLACEMENT = {}
+    WATER_TILE_REPLACEMENT["water"] = "red-desert-0"
+    WATER_TILE_REPLACEMENT["water-green"] = "red-desert-1"
+    WATER_TILE_REPLACEMENT["deepwater"] = "red-desert-2"
+    WATER_TILE_REPLACEMENT["deepwater-green"] = "red-desert-3"
 
-function ribbonMazeConfig()
+    local RESOURCE_MATRIX = {}
+    RESOURCE_MATRIX[2] = {
+        "iron-ore",
+        "copper-ore",
+        "coal",
+        "stone",
+    }
+    RESOURCE_MATRIX[4] = {
+        "coal",
+        "iron-ore",
+    }
+    RESOURCE_MATRIX[6] = {
+        "copper-ore",
+        "stone",
+    }
+    RESOURCE_MATRIX[8] = {
+        "crude-oil",
+    }
+    RESOURCE_MATRIX[10] = {
+        "uranium-ore",
+        "crude-oil",
+        "iron-ore",
+    }
+    local RESOURCE_MATRIX_MAX = 10
 
     -- idea here is to access the settings table just once per event, for performance
     local settingsGlobal = settings.global
@@ -172,18 +174,27 @@ function ribbonMazeConfig()
         clearMazeStartChunks = clearMazeStartChunks,
     }
 
-    return config
+    -- Update chached ribbon maze config here and return
+    cachedRibbonMazeConfig = config
+    return cachedRibbonMazeConfig
 end
 
--- A cut-down config object just for terraforming, to avoid unnecessary overhead when terraforming. Make sure it
--- matches up with the ribbonMazeConfig() if using both the maze and terraforming:
-local TERRAFORMING_CONFIG = {
-    waterTile = "water",
-    mazeWallTile = "water-green"
-}
-function terraformingConfig()
-    return TERRAFORMING_CONFIG
+--------------------------------------------------------
+-- Boilerplate for settings and configuration caching --
+--------------------------------------------------------
+
+function ribbonMazeConfig()
+    if cachedRibbonMazeConfig then
+        return cachedRibbonMazeConfig
+    end
+    return createRibbonMazeConfig()
 end
+
+local function clearCachedConfiguration()
+    cachedRibbonMazeConfig = nil
+end
+
+script.on_configuration_changed(clearCachedConfiguration)
 
 ----------------------------------------------------
 -- Require and register the maze control handlers --
