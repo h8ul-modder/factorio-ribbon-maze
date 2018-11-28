@@ -241,7 +241,7 @@ local function initModSurfaceInfo(config, surface, modSurfaceInfo)
     modSurfaceInfo.initComplete = true
 end
 
-function chunkGeneratedEventHandler(event)
+function ribbonMazeChunkGeneratedEventHandler(event)
 
     local config = ribbonMazeConfig()
 
@@ -493,7 +493,7 @@ function chunkGeneratedEventHandler(event)
 
 end
 
-function playerCreatedEventHander(event)
+function ribbonMazePlayerCreatedEventHander(event)
 
     local config = ribbonMazeConfig()
 
@@ -558,7 +558,7 @@ local function resourceScanning(research, resourceName)
     end
 end
 
-function resourceFinishedEventHandler(event)
+function ribbonMazeResourceFinishedEventHandler(event)
     local research = event.research
     if research and research.name == "oil-scanning" then
         resourceScanning(research, "crude-oil")
@@ -567,7 +567,7 @@ function resourceFinishedEventHandler(event)
     end
 end
 
-function initHandler()
+function ribbonMazeInitHandler()
 
     local config = ribbonMazeConfig()
 

@@ -20,44 +20,43 @@
    SOFTWARE.
 --]]
 
-local cachedRibbonMazeConfig
-
 --------------------------------------------------------
 -- Configure fixed constants, and proxy any settings ---
 --------------------------------------------------------
 
-local function createRibbonMazeConfig()
+-- This function must be called createRibbonMazeConfig(). It is recommended to use only settings, but global/game are
+-- also available. It can be relatively expensive because it is only run on settings/configuration change.
+function createRibbonMazeConfig()
 
-    local WATER_TILE_REPLACEMENT = {}
-    WATER_TILE_REPLACEMENT["water"] = "red-desert-0"
-    WATER_TILE_REPLACEMENT["water-green"] = "red-desert-1"
-    WATER_TILE_REPLACEMENT["deepwater"] = "red-desert-2"
-    WATER_TILE_REPLACEMENT["deepwater-green"] = "red-desert-3"
+    local waterTileReplacement = {}
+    waterTileReplacement["water"] = "red-desert-0"
+    waterTileReplacement["water-green"] = "red-desert-1"
+    waterTileReplacement["deepwater"] = "red-desert-2"
+    waterTileReplacement["deepwater-green"] = "red-desert-3"
 
-    local RESOURCE_MATRIX = {}
-    RESOURCE_MATRIX[2] = {
+    local resourceMatrix = {}
+    resourceMatrix[2] = {
         "iron-ore",
         "copper-ore",
         "coal",
         "stone",
     }
-    RESOURCE_MATRIX[4] = {
+    resourceMatrix[4] = {
         "coal",
         "iron-ore",
     }
-    RESOURCE_MATRIX[6] = {
+    resourceMatrix[6] = {
         "copper-ore",
         "stone",
     }
-    RESOURCE_MATRIX[8] = {
+    resourceMatrix[8] = {
         "crude-oil",
     }
-    RESOURCE_MATRIX[10] = {
+    resourceMatrix[10] = {
         "uranium-ore",
         "crude-oil",
         "iron-ore",
     }
-    local RESOURCE_MATRIX_MAX = 10
 
     -- idea here is to access the settings table just once per event, for performance
     local settingsGlobal = settings.global
@@ -120,7 +119,7 @@ local function createRibbonMazeConfig()
 
     local clearMazeStartChunks = settingsGlobal["ribbon-maze-clear-start"].value
 
-    local config = {
+    return {
         -- True if terraforming prototypes are available, in which case entities and forces will be created to allow
         -- automated terraforming with artillery
         terraformingPrototypesEnabled = true,
@@ -136,7 +135,7 @@ local function createRibbonMazeConfig()
         mazeWallTile = "water-green",
 
         -- Replace water tiles so that water doesn't block exploration
-        waterTileReplacement = WATER_TILE_REPLACEMENT,
+        waterTileReplacement = waterTileReplacement,
 
         -- Maze dimensions are calculated from the narrowist finite map size or else use the default width
         -- This default is chosen to allow a be 3 radars in width, so one radar can't reveal it all, and provide some
@@ -157,45 +156,32 @@ local function createRibbonMazeConfig()
         -- Mixed ores near start are picked randomly from this array; duplicate entries increase a resource's
         -- odds of being picked.
         mixedResources = mixedResources,
+        -- There will be at least one of any forced mixed resources in a patch, space permitting:
         forcedMixedResources = forcedMixedResources,
         minMixedResourcesPatchworkSize = minMixedResourcesPatchworkSize,
         maxMixedResourcesPatchworkSize = maxMixedResourcesPatchworkSize,
 
         -- The resource matrix controls which resources can be picked at a given length of corridor (i.e. a length of
-        -- maze with no junctions; bends are ok though). Only even numbers are possible. Corridor length calcuation is
-        -- capped at RESOURCE_MATRIX_MAX.
+        -- maze with no junctions; bends are ok though). Only even numbers are possible. Corridor length calculation is
+        -- capped at the highest index given in the table.
         -- The first time a corridor of a given length is looked at, the first entry is picked. So the first resource
         -- created in a corridor of length 10 will always be uranium. After that, it is random. Resources are always
         -- calcuated in order rom bottom-left to top-right.
-        resourceMatrix = RESOURCE_MATRIX,
-        resourceMatrixMax = RESOURCE_MATRIX_MAX,
+        resourceMatrix = resourceMatrix,
 
         -- Creates a clear maze of this many chunks
         clearMazeStartChunks = clearMazeStartChunks,
     }
-
-    -- Update chached ribbon maze config here and return
-    cachedRibbonMazeConfig = config
-    return cachedRibbonMazeConfig
 end
 
---------------------------------------------------------
--- Boilerplate for settings and configuration caching --
---------------------------------------------------------
+-----------------------------------------
+-- Require and register config caching --
+-----------------------------------------
 
-function ribbonMazeConfig()
-    if cachedRibbonMazeConfig then
-        return cachedRibbonMazeConfig
-    end
-    return createRibbonMazeConfig()
-end
+require "control.config-control"
 
-local function clearCachedConfiguration()
-    cachedRibbonMazeConfig = nil
-end
-
-script.on_configuration_changed(clearCachedConfiguration)
-script.on_event(defines.events.on_runtime_mod_setting_changed, clearCachedConfiguration)
+script.on_configuration_changed(ribbonMazeConfigurationChanged)
+script.on_event(defines.events.on_runtime_mod_setting_changed, ribbonMazeModSettingChanged)
 
 ----------------------------------------------------
 -- Require and register the maze control handlers --
@@ -203,11 +189,11 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, clearCachedConfig
 
 require "control.maze-control"
 
-script.on_init(initHandler)
+script.on_init(ribbonMazeInitHandler)
 
-script.on_event(defines.events.on_player_created, playerCreatedEventHander)
-script.on_event(defines.events.on_chunk_generated, chunkGeneratedEventHandler)
-script.on_event(defines.events.on_research_finished, resourceFinishedEventHandler)
+script.on_event(defines.events.on_player_created, ribbonMazePlayerCreatedEventHander)
+script.on_event(defines.events.on_chunk_generated, ribbonMazeChunkGeneratedEventHandler)
+script.on_event(defines.events.on_research_finished, ribbonMazeResourceFinishedEventHandler)
 
 ------------------------------------------------------------
 -- Require and register the terraforming control handlers --
