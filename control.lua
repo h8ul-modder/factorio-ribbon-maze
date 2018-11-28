@@ -195,6 +195,7 @@ local function clearCachedConfiguration()
 end
 
 script.on_configuration_changed(clearCachedConfiguration)
+script.on_event(defines.events.on_runtime_mod_setting_changed, clearCachedConfiguration)
 
 ----------------------------------------------------
 -- Require and register the maze control handlers --
