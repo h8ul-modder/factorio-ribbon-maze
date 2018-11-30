@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.6.7
+Date: 30. 11. 2018
+  Balance:
+    - Reduce frequency of Mangrove (Bruguiera) by half. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/17)
+  Bugfixes:
+    - Mangrove (Bruguiera) not removed in terraforming. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/16)
+---------------------------------------------------------------------------------------------------
 Version: 0.6.6
 Date: 30. 11. 2018
   Features:
