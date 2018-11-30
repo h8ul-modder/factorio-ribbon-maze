@@ -3,8 +3,11 @@ Version: 0.6.6
 Date: 28. 11. 2018
   Features:
     - New setting: Patchwork Size for Mixed Resources. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/11)
+    - Grid-based crude oil entity placement with better spacing (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/10)
   Optimisations:
-    - Cache settings and configuration values, especially the resource matrix. https://github.com/h8ul-modder/factorio-ribbon-maze/issues/13
+    - Cache settings and configuration values, especially the resource matrix. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/13)
+  Bugfixes:
+    - Each resource patch now uses its dedicated random number sequence as intended, so that order of chunk generation doesn't affect resources. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/14)
 ---------------------------------------------------------------------------------------------------
 Version: 0.6.5
 Date: 25. 11. 2018
