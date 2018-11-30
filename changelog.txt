@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.6.6
-Date: 28. 11. 2018
+Date: 30. 11. 2018
   Features:
     - New setting: Patchwork Size for Mixed Resources. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/11)
     - Grid-based crude oil entity placement with better spacing (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/10)
