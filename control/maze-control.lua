@@ -381,12 +381,15 @@ function ribbonMazeChunkGeneratedEventHandler(event)
 
         local resourceName = resource.resourceName
 
-        local chunkRandomAdjustment = Cmwc.randFractionRange(modSurfaceInfo.resourceGridRng, resource.minRand, 1.0)
-
-        local cumulativeOil = 0
+        local chunkRandomAdjustment = Cmwc.randFractionRange(resource.rng, resource.minRand, 1.0)
 
         local mixedBag
         local patchworkSize
+
+        local sizeX
+        local sizeY
+        local minimumAmount
+
         if resourceName == "mixed_" then
             mixedBag = {table.unpack(config.forcedMixedResources) }
             if config.minMixedResourcesPatchworkSize ~= config.maxMixedResourcesPatchworkSize then
@@ -398,93 +401,80 @@ function ribbonMazeChunkGeneratedEventHandler(event)
                     end
                 end
 
-                local patchworkSizeIndex = Cmwc.randRange(modSurfaceInfo.resourceGridRng, 1, #mixedResourcesPatchworkSizes)
+                local patchworkSizeIndex = Cmwc.randRange(resource.rng, 1, #mixedResourcesPatchworkSizes)
                 patchworkSize = mixedResourcesPatchworkSizes[patchworkSizeIndex]
             else
                 patchworkSize = config.minMixedResourcesPatchworkSize
             end
+        else
+            local collisionBox = game.entity_prototypes[resourceName].collision_box
+            sizeX = math.ceil(collisionBox.right_bottom.x - collisionBox.left_top.x)
+            sizeY = math.ceil(collisionBox.right_bottom.y - collisionBox.left_top.y)
+            if (sizeX > 1) then
+                sizeX = sizeX + 1
+            end
+            if (sizeY > 1) then
+                sizeY = sizeY + 1
+            end
+            minimumAmount = game.entity_prototypes[resourceName].minimum_resource_amount or 100
         end
 
         for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+30 do
-
-            local crudeOilOffset = 0
-            if resourceName == "crude-oil" and Cmwc.randFraction(modSurfaceInfo.resourceGridRng) > 0.5 then
-                crudeOilOffset = 1
-            end
 
             for tileX = chunkArea.left_top.x+1, chunkArea.left_top.x+30 do
 
                 local resourceName = resource.resourceName
 
-                if resourceName == "crude-oil" then
+                if resourceName == "mixed_" then
 
-                    local tileRandomAdjustment = Cmwc.randFractionRange(modSurfaceInfo.resourceGridRng, resource.minRand, 1.0)
-                    local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
+                    local moduloX = (tileX-(chunkArea.left_top.x+1)) % patchworkSize
+                    local moduloY = (tileY-(chunkArea.left_top.y+1)) % patchworkSize
+                    if (moduloX == 0 and moduloY == 0) then
+                        local randomOre
+                        if #mixedBag > 0 then
+                            local randomOreIndex = Cmwc.randRange(resource.rng, 1, #mixedBag)
+                            randomOre = mixedBag[randomOreIndex]
+                            table.remove(mixedBag, randomOreIndex)
+                        else
+                            local randomOreIndex = Cmwc.randRange(resource.rng, 1, #config.mixedResources)
+                            randomOre = config.mixedResources[randomOreIndex]
+                        end
 
-                    local placementCoinToss = Cmwc.randFraction(modSurfaceInfo.resourceGridRng)
+                        for randomOreX=tileX,tileX+patchworkSize-1 do
+                            for randomOreY=tileY,tileY+patchworkSize-1 do
 
-                    if tileX-chunkArea.left_top.x < 2 or (tileX+crudeOilOffset) % 2 == 0 or tileY % 2 == 0 or placementCoinToss < 0.75 then
-                        amount = 0
-                    end
-
-                    cumulativeOil = cumulativeOil + amount
-
-                    if amount >= 100 then
-                        surface.create_entity{
-                            name=resourceName,
-                            amount=cumulativeOil*10,
-                            initial_amount=cumulativeOil*10,
-                            position={tileX, tileY},
-                            enable_tree_removal=true,
-                            enable_cliff_removal=true}
-                        cumulativeOil = 0
-                    end
-                else
-                    if resourceName == "mixed_" then
-
-                        local moduloX = (tileX-(chunkArea.left_top.x+1)) % patchworkSize
-                        local moduloY = (tileY-(chunkArea.left_top.y+1)) % patchworkSize
-                        if (moduloX == 0 and moduloY == 0) then
-                            local randomOre
-                            if #mixedBag > 0 then
-                                local randomOreIndex = Cmwc.randRange(resource.rng, 1, #mixedBag)
-                                randomOre = mixedBag[randomOreIndex]
-                                table.remove(mixedBag, randomOreIndex)
-                            else
-                                local randomOreIndex = Cmwc.randRange(resource.rng, 1, #config.mixedResources)
-                                randomOre = config.mixedResources[randomOreIndex]
-                            end
-
-                            for randomOreX=tileX,tileX+patchworkSize-1 do
-                                for randomOreY=tileY,tileY+patchworkSize-1 do
-
-                                    local tileRandomAdjustment = Cmwc.randFractionRange(modSurfaceInfo.resourceGridRng, resource.minRand, 1.0)
-                                    local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
-
-                                    surface.create_entity{
-                                        name=randomOre,
-                                        amount=amount,
-                                        initial_amount=amount,
-                                        position={randomOreX, randomOreY},
-                                        enable_tree_removal=true,
-                                        enable_cliff_removal=true}
+                                local tileRandomAdjustment = Cmwc.randFractionRange(resource.rng, resource.minRand, 1.0)
+                                local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
+                                minimumAmount = game.entity_prototypes[randomOre].minimum_resource_amount or 100
+                                if amount < minimumAmount then
+                                    amount = amount + minimumAmount
                                 end
+
+                                surface.create_entity{
+                                    name=randomOre,
+                                    amount=amount,
+                                    initial_amount=amount,
+                                    position={randomOreX, randomOreY},
+                                    enable_tree_removal=true,
+                                    enable_cliff_removal=true}
                             end
                         end
-                    else
-                        local tileRandomAdjustment = Cmwc.randFractionRange(modSurfaceInfo.resourceGridRng, resource.minRand, 1.0)
-                        local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
+                    end
+                else
+                    local tileRandomAdjustment = Cmwc.randFractionRange(resource.rng, resource.minRand, 1.0)
+                    local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
+                    if amount < minimumAmount then
+                        amount = minimumAmount + amount
+                    end
 
-                        if resourceName and amount >= 10 then
-
-                            surface.create_entity{
+                    if (tileY-(chunkArea.left_top.y+1)) % sizeY == 0 and (tileX-(chunkArea.left_top.x+1)) % sizeX == 0 then
+                        surface.create_entity{
                             name=resourceName,
                             amount=amount,
                             initial_amount=amount,
                             position={tileX, tileY},
                             enable_tree_removal=true,
-                            enable_cliff_removal=true }
-                        end
+                            enable_cliff_removal=true}
                     end
                 end
             end
