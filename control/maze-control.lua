@@ -314,7 +314,7 @@ function ribbonMazeChunkGeneratedEventHandler(event)
                     for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+30 do
                         for tileX = chunkArea.left_top.x+30, chunkArea.left_top.x+31 do
                             local randMangrove = Cmwc.randFraction(modSurfaceInfo.firstMazeRowMangroveRng[x])
-                            if randMangrove > 0.9 then
+                            if randMangrove > 0.95 then
                                 surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
                             elseif randMangrove > 0.5 then
                                 surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
@@ -334,7 +334,7 @@ function ribbonMazeChunkGeneratedEventHandler(event)
                     for tileX = chunkArea.left_top.x+1, chunkArea.left_top.x+30 do
                         for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+2 do
                             local randMangrove = Cmwc.randFraction(modSurfaceInfo.firstMazeRowMangroveRng[x])
-                            if randMangrove > 0.9 then
+                            if randMangrove > 0.95 then
                                 surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
                             elseif randMangrove > 0.5 then
                                 surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
