@@ -70,7 +70,7 @@ data:extend {{
     icon_size = 32,
     flags = {"placeable-neutral"},
     order="a-b-mangrove-bruguiera",
-    collision_mask = {"resource-layer", "water-tile"},
+    collision_mask = {"resource-layer", "ground-tile"},
     collision_box = {{ -0.1, -0.1}, {0.1, 0.1}},
     selection_box = {{ -0.5, -0.5}, {0.5, 0.5}},
     emissions_per_tick = -0.0001,
