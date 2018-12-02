@@ -105,5 +105,19 @@ data:extend{
         default_value = true,
         order="rb-k",
     },
+    {
+        type = "bool-setting",
+        name = "ribbon-maze-mod-resources",
+        setting_type = "runtime-global",
+        default_value = false,
+        order="rb-m",
+    },
+    {
+        type = "bool-setting",
+        name = "ribbon-maze-separate-out-infinite-ores",
+        setting_type = "runtime-global",
+        default_value = false,
+        order="rb-m-infinite",
+    },
 }
 

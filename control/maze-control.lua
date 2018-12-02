@@ -102,7 +102,9 @@ local function calculateResource(config, surface, modSurfaceInfo, x, y)
         modSurfaceInfo.corridorStats[deadEnd.corridorLength] = modSurfaceInfo.corridorStats[deadEnd.corridorLength] + 1
     end
 
-    if not choice then error("resource calcuation bug: no choice was made at " .. x .. ", " .. y) end
+    if not choice then
+        return
+    end
 
     local resource = {}
 
@@ -390,6 +392,11 @@ function ribbonMazeChunkGeneratedEventHandler(event)
         local sizeY
         local minimumAmount
 
+        local infiniteReplacement
+        local infiniteMinimumAmount
+        local infiniteReplacementAreaMin
+        local infiniteReplacementAreaMax
+
         if resourceName == "mixed_" then
             mixedBag = {table.unpack(config.forcedMixedResources) }
             if config.minMixedResourcesPatchworkSize ~= config.maxMixedResourcesPatchworkSize then
@@ -417,6 +424,23 @@ function ribbonMazeChunkGeneratedEventHandler(event)
                 sizeY = sizeY + 1
             end
             minimumAmount = game.entity_prototypes[resourceName].minimum_resource_amount or 100
+
+            if config.infiniteOres then
+                infiniteReplacement = config.infiniteOres[resourceName]
+                if infiniteReplacement then
+                    infiniteMinimumAmount = game.entity_prototypes[infiniteReplacement].minimum_resource_amount or 100
+                    local infiniteReplacementSize = Maze.deadEnd(modSurfaceInfo.maze, x, y).yHighest / config.infiniteOreDistanceFactor
+                    if infiniteReplacementSize < 1 then
+                        infiniteReplacement = nil
+                    elseif infiniteReplacementSize > 11 then
+                        infiniteReplacementSize = 11
+                    end
+                    if infiniteReplacement then
+                        infiniteReplacementAreaMin = 15-infiniteReplacementSize
+                        infiniteReplacementAreaMax = 15+infiniteReplacementSize
+                    end
+                end
+            end
         end
 
         for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+30 do
@@ -440,36 +464,56 @@ function ribbonMazeChunkGeneratedEventHandler(event)
                             randomOre = config.mixedResources[randomOreIndex]
                         end
 
-                        for randomOreX=tileX,tileX+patchworkSize-1 do
-                            for randomOreY=tileY,tileY+patchworkSize-1 do
+                        if randomOre then
+                            for randomOreX=tileX,tileX+patchworkSize-1 do
+                                for randomOreY=tileY,tileY+patchworkSize-1 do
 
-                                local tileRandomAdjustment = Cmwc.randFractionRange(resource.rng, resource.minRand, 1.0)
-                                local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
-                                minimumAmount = game.entity_prototypes[randomOre].minimum_resource_amount or 100
-                                if amount < minimumAmount then
-                                    amount = amount + minimumAmount
+                                    local tileRandomAdjustment = Cmwc.randFractionRange(resource.rng, resource.minRand, 1.0)
+                                    local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
+                                    amount = amount * config.mixedResourcesMultiplier
+                                    minimumAmount = game.entity_prototypes[randomOre].minimum_resource_amount or 100
+                                    if amount < minimumAmount then
+                                        amount = amount + minimumAmount
+                                    end
+
+                                    surface.create_entity{
+                                        name=randomOre,
+                                        amount=amount,
+                                        initial_amount=amount,
+                                        position={randomOreX, randomOreY},
+                                        enable_tree_removal=true,
+                                        enable_cliff_removal=true}
                                 end
-
-                                surface.create_entity{
-                                    name=randomOre,
-                                    amount=amount,
-                                    initial_amount=amount,
-                                    position={randomOreX, randomOreY},
-                                    enable_tree_removal=true,
-                                    enable_cliff_removal=true}
                             end
                         end
                     end
                 else
                     local tileRandomAdjustment = Cmwc.randFractionRange(resource.rng, resource.minRand, 1.0)
+
+                    local tileYOffset = tileY-(chunkArea.left_top.y+1)
+                    local tileXOffset = tileX-(chunkArea.left_top.x+1)
+
                     local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
-                    if amount < minimumAmount then
-                        amount = minimumAmount + amount
+                    local thisTileResource = resourceName
+
+                    if infiniteReplacement and
+                            tileYOffset >= infiniteReplacementAreaMin and
+                            tileYOffset <= infiniteReplacementAreaMax and
+                            tileXOffset >= infiniteReplacementAreaMin and
+                            tileXOffset <= infiniteReplacementAreaMax then
+                        thisTileResource = infiniteReplacement
+                        if amount < infiniteMinimumAmount then
+                            amount = infiniteMinimumAmount + amount
+                        end
+                    else
+                        if amount < minimumAmount then
+                            amount = minimumAmount + amount
+                        end
                     end
 
-                    if (tileY-(chunkArea.left_top.y+1)) % sizeY == 0 and (tileX-(chunkArea.left_top.x+1)) % sizeX == 0 then
+                    if tileYOffset % sizeY == 0 and tileXOffset % sizeX == 0 then
                         surface.create_entity{
-                            name=resourceName,
+                            name=thisTileResource,
                             amount=amount,
                             initial_amount=amount,
                             position={tileX, tileY},
