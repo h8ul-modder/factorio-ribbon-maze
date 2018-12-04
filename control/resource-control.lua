@@ -83,12 +83,30 @@ local function deadEndEnabled(settingsGlobal, resource)
     return settingsGlobal["ribbon-maze-mod-resources"].value
 end
 
+local function guessAvoidStartingArea(resource)
+    local prototype = game.entity_prototypes[resource]
+    if prototype and prototype.autoplace_specification and prototype.autoplace_specification.peaks then
+        -- look for a peak that reduces the influence in the starting area (as done with uranium, and certain angel's ores):
+        for _,v in ipairs(prototype.autoplace_specification.peaks) do
+            if v.influence and v.starting_area_weight_optimal and v.influence <= -1 and v.starting_area_weight_optimal == 1 then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 local function guessMixedOreStrength(resource)
     local prototype = game.entity_prototypes[resource]
+
+    if guessAvoidStartingArea(resource) then
+        return 0
+    end
+
     if prototype.resource_category == "basic-solid" and
             prototype.mineable_properties and not
-    prototype.mineable_properties.required_fluid and not
-    prototype.infinite_resource then
+            prototype.mineable_properties.required_fluid and not
+            prototype.infinite_resource then
         return 1
     else
         return 0
@@ -124,28 +142,18 @@ mixedOreStrengths["zinc-ore"] = 0
 mixedOreStrengths["ground-water"] = 0
 mixedOreStrengths["lithia_water"] = 0
 -- angel's refining:
-mixedOreStrengths["angels-ore1"] = 4
-mixedOreStrengths["angels-ore2"] = 1
-mixedOreStrengths["angels-ore3"] = 4
-mixedOreStrengths["angels-ore4"] = 1
-mixedOreStrengths["angels-ore5"] = 4
-mixedOreStrengths["angels-ore6"] = 4
+mixedOreStrengths["angels-ore1"] = 2
+mixedOreStrengths["angels-ore2"] = 0
+mixedOreStrengths["angels-ore3"] = 2
+mixedOreStrengths["angels-ore4"] = 0
+mixedOreStrengths["angels-ore5"] = 2
+mixedOreStrengths["angels-ore6"] = 2
 -- yuoki industries:
 mixedOreStrengths["y-res1"] = 1
 mixedOreStrengths["y-res2"] = 1
 -- dark matter replicators:
 mixedOreStrengths["tenemut"] = 1
--- mad clown's ores:
-mixedOreStrengths["clowns-ore1"] = 1
-mixedOreStrengths["clowns-ore2"] = 1
-mixedOreStrengths["clowns-ore3"] = 1
-mixedOreStrengths["clowns-ore4"] = 1
-mixedOreStrengths["clowns-ore5"] = 1
-mixedOreStrengths["clowns-ore6"] = 1
-mixedOreStrengths["clowns-ore7"] = 1
-mixedOreStrengths["clowns-ore8"] = 1
-mixedOreStrengths["clowns-ore9"] = 1
-mixedOreStrengths["clowns-ore10"] = 1
+-- mad clown's ores (use automatic guessing)
 
 -- The depths at which to add certain ores to the resource matrix (excluding some hard-coded values below to ensure
 -- critical vanilla resources spawn in the first available corridor of the given depth)
@@ -176,9 +184,9 @@ resourceCorridorDepths["ground-water"] = {6,8}
 resourceCorridorDepths["lithia_water"] = {6,8}
 -- angel's refining:
 resourceCorridorDepths["angels-ore1"] = {2,4,6,8,10}
-resourceCorridorDepths["angels-ore2"] = {2,4,6,8,10}
+resourceCorridorDepths["angels-ore2"] = {6,8,10}
 resourceCorridorDepths["angels-ore3"] = {2,4,6,8,10}
-resourceCorridorDepths["angels-ore4"] = {2,4,6,8,10}
+resourceCorridorDepths["angels-ore4"] = {6,8,10}
 resourceCorridorDepths["angels-ore5"] = {2,4,6,8,10}
 resourceCorridorDepths["angels-ore6"] = {2,4,6,8,10}
 -- yuoki industries:
@@ -186,22 +194,14 @@ resourceCorridorDepths["y-res1"] = {2,4,6,8,10}
 resourceCorridorDepths["y-res2"] = {2,4,6,8,10}
 -- dark matter replicators:
 resourceCorridorDepths["tenemut"] = {2,4,6,8,10}
--- mad clown's ores:
-resourceCorridorDepths["clowns-ore1"] = {2,4,6,8,10}
-resourceCorridorDepths["clowns-ore2"] = {2,4,6,8,10}
-resourceCorridorDepths["clowns-ore3"] = {2,4,6,8,10}
-resourceCorridorDepths["clowns-ore4"] = {2,4,6,8,10}
-resourceCorridorDepths["clowns-ore5"] = {2,4,6,8,10}
-resourceCorridorDepths["clowns-ore6"] = {2,4,6,8,10}
-resourceCorridorDepths["clowns-ore7"] = {2,4,6,8,10}
-resourceCorridorDepths["clowns-ore8"] = {2,4,6,8,10}
-resourceCorridorDepths["clowns-ore9"] = {2,4,6,8,10}
-resourceCorridorDepths["clowns-ore10"] = {2,4,6,8,10}
+-- mad clown's ores (use automatic guessing)
 
 local function guessResourceCorridorDepths(resource)
     local prototype = game.entity_prototypes[resource]
     if prototype and prototype.infinite_resource then
         return {8,10}
+    elseif guessAvoidStartingArea(resource) then
+        return {6,8,10}
     else
         return {2,4,6,8,10}
     end
