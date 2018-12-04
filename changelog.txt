@@ -1,6 +1,13 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.6.7
-Date: 30. 11. 2018
+Date: 04. 12. 2018
+  Major Features:
+    - Mod ores can now be put at dead ends like vanilla ores. Supports practically any mod, with fine-tuning for popular mods such as
+      Bob's Ores, Angel's Refining, Angel's Infinite Ores, Yuoki Industries, and more. Enable with the "Dead end mod resources" setting.
+      (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/1)
+  Features:
+    - Settings to control how infinite ores from mods are handled. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/20)
+    - Setting to stretch out resource richness increase. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/21)
   Balance:
     - Reduce frequency of Mangrove (Bruguiera) by half. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/17)
   Bugfixes:
