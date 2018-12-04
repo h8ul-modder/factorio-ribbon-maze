@@ -477,14 +477,15 @@ function ribbonMazeChunkGeneratedEventHandler(event)
                                     if amount < minimumAmount then
                                         amount = amount + minimumAmount
                                     end
-
-                                    surface.create_entity{
-                                        name=randomOre,
-                                        amount=amount,
-                                        initial_amount=amount,
-                                        position={randomOreX, randomOreY},
-                                        enable_tree_removal=true,
-                                        enable_cliff_removal=true}
+                                    if amount >= 1 then
+                                        surface.create_entity{
+                                            name=randomOre,
+                                            amount=amount,
+                                            initial_amount=amount,
+                                            position={randomOreX, randomOreY},
+                                            enable_tree_removal=true,
+                                            enable_cliff_removal=true}
+                                    end
                                 end
                             end
                         end
@@ -513,7 +514,7 @@ function ribbonMazeChunkGeneratedEventHandler(event)
                         end
                     end
 
-                    if tileYOffset % sizeY == 0 and tileXOffset % sizeX == 0 then
+                    if amount >= 1 and tileYOffset % sizeY == 0 and tileXOffset % sizeX == 0 then
                         surface.create_entity{
                             name=thisTileResource,
                             amount=amount,
