@@ -64,6 +64,16 @@ data:extend{
     },
 
     {
+        type = "double-setting",
+        name = "ribbon-maze-resource-stretch-factor",
+        setting_type = "runtime-global",
+        minimum_value = 0.01,
+        maximum_value = 1000,
+        default_value = 1,
+        order="rb-resource-stretch-factor",
+    },
+
+    {
         type = "bool-setting",
         name = "ribbon-maze-stone",
         setting_type = "runtime-global",
@@ -124,6 +134,7 @@ data:extend{
         name = "ribbon-maze-infinite-ore-stretch-factor",
         setting_type = "runtime-global",
         minimum_value = 0.01,
+        maximum_value = 1000,
         default_value = 8,
         order="rb-m-infinite-stretch-factor",
     },

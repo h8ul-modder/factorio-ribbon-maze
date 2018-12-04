@@ -112,12 +112,13 @@ local function calculateResource(config, surface, modSurfaceInfo, x, y)
         resource.resourceName = choice
         resource.minRand = 1.0 - (1.0 / (1+deadEnd.corridorLength/2))
         resource.rng = Cmwc.deriveNew(modSurfaceInfo.resourceGridRng)
-        if deadEnd.yHighest > 400 then
+        local distance = deadEnd.yHighest / config.resourceStretchFactor
+        if distance > 400 then
             resource.resourceAmount = 400 * 400 * 400
-        elseif deadEnd.yHighest >= 7 then
-            resource.resourceAmount = 4 * deadEnd.yHighest * deadEnd.yHighest * deadEnd.yHighest
+        elseif distance >= 7 then
+            resource.resourceAmount = 4 * distance * deadEnd.yHighest * distance
         else
-            resource.resourceAmount = 40 * deadEnd.yHighest * deadEnd.yHighest
+            resource.resourceAmount = 40 * distance * deadEnd.yHighest
         end
     end
 

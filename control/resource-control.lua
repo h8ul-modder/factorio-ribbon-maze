@@ -344,6 +344,7 @@ function createRibbonMazeConfig()
         -- The ores which are controlled by the mod. Only resources in this table will be added to dead ends and
         -- forcibly removed from other locations.
         resources = resources,
+        resourceStretchFactor = settingsGlobal["ribbon-maze-resource-stretch-factor"].value,
 
         -- Infinite equivalents of ores, to place them at the centre of resource patches
         infiniteOres = infiniteOres,
