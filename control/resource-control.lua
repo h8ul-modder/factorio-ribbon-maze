@@ -347,7 +347,7 @@ function createRibbonMazeConfig()
 
         -- Infinite equivalents of ores, to place them at the centre of resource patches
         infiniteOres = infiniteOres,
-        infiniteOreDistanceFactor = 8,
+        infiniteOreStretchFactor = settingsGlobal["ribbon-maze-infinite-ore-stretch-factor"].value,
 
         -- Mixed ores near start are picked randomly from this array; duplicate entries increase a resource's
         -- odds of being picked.

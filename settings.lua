@@ -119,5 +119,13 @@ data:extend{
         default_value = false,
         order="rb-m-infinite",
     },
+    {
+        type = "double-setting",
+        name = "ribbon-maze-infinite-ore-stretch-factor",
+        setting_type = "runtime-global",
+        minimum_value = 0.01,
+        default_value = 8,
+        order="rb-m-infinite-stretch-factor",
+    },
 }
 

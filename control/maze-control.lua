@@ -429,14 +429,15 @@ function ribbonMazeChunkGeneratedEventHandler(event)
                 infiniteReplacement = config.infiniteOres[resourceName]
                 if infiniteReplacement then
                     infiniteMinimumAmount = game.entity_prototypes[infiniteReplacement].minimum_resource_amount or 100
-                    local infiniteReplacementSize = Maze.deadEnd(modSurfaceInfo.maze, x, y).yHighest / config.infiniteOreDistanceFactor
+                    local infiniteReplacementSize = math.floor(Maze.deadEnd(modSurfaceInfo.maze, x, y).yHighest / config.infiniteOreStretchFactor)
                     if infiniteReplacementSize < 1 then
                         infiniteReplacement = nil
                     elseif infiniteReplacementSize > 11 then
                         infiniteReplacementSize = 11
                     end
                     if infiniteReplacement then
-                        infiniteReplacementAreaMin = 15-infiniteReplacementSize
+                        infiniteReplacementSize = infiniteReplacementSize - 1
+                        infiniteReplacementAreaMin = 14-infiniteReplacementSize
                         infiniteReplacementAreaMax = 15+infiniteReplacementSize
                     end
                 end
