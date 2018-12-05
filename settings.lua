@@ -23,46 +23,50 @@
 data:extend{
     {
         type = "int-setting",
+        name = "ribbon-maze-block-size",
+        setting_type = "runtime-global",
+        default_value = 32,
+        allowed_values = {32,64,96,128,192,256},
+        order="rb-b",
+    },
+    {
+        type = "int-setting",
         name = "ribbon-maze-clear-start",
         setting_type = "runtime-global",
         default_value = 0,
-        order="rb-a",
+        order="rb-c",
     },
-
     {
         type = "bool-setting",
         name = "ribbon-maze-chart-nearby-crude-oil",
         setting_type = "runtime-global",
         default_value = false
         ,
-        order="rb-b",
+        order="rb-d",
     },
     {
         type = "bool-setting",
         name = "ribbon-maze-chart-nearby-uranium-ore",
         setting_type = "runtime-global",
         default_value = false,
-        order="rb-c",
+        order="rb-e",
     },
-
     {
         type = "int-setting",
         name = "ribbon-maze-mixed-patchwork-min",
         setting_type = "runtime-global",
         default_value = 1,
         allowed_values = {1,2,3,5,6,10,15},
-        order="rb-d",
+        order="rb-f",
     },
-
     {
         type = "int-setting",
         name = "ribbon-maze-mixed-patchwork-max",
         setting_type = "runtime-global",
         default_value = 15,
         allowed_values = {1,2,3,5,6,10,15},
-        order="rb-e",
+        order="rb-g",
     },
-
     {
         type = "double-setting",
         name = "ribbon-maze-resource-stretch-factor",
@@ -72,48 +76,47 @@ data:extend{
         default_value = 1,
         order="rb-resource-stretch-factor",
     },
-
     {
         type = "bool-setting",
         name = "ribbon-maze-stone",
-        setting_type = "runtime-global",
-        default_value = true,
-        order="rb-f",
-    },
-    {
-        type = "bool-setting",
-        name = "ribbon-maze-coal",
-        setting_type = "runtime-global",
-        default_value = true,
-        order="rb-g",
-    },
-    {
-        type = "bool-setting",
-        name = "ribbon-maze-copper-ore",
         setting_type = "runtime-global",
         default_value = true,
         order="rb-h",
     },
     {
         type = "bool-setting",
-        name = "ribbon-maze-iron-ore",
+        name = "ribbon-maze-coal",
         setting_type = "runtime-global",
         default_value = true,
         order="rb-i",
     },
     {
         type = "bool-setting",
-        name = "ribbon-maze-uranium-ore",
+        name = "ribbon-maze-copper-ore",
         setting_type = "runtime-global",
         default_value = true,
         order="rb-j",
     },
     {
         type = "bool-setting",
-        name = "ribbon-maze-crude-oil",
+        name = "ribbon-maze-iron-ore",
         setting_type = "runtime-global",
         default_value = true,
         order="rb-k",
+    },
+    {
+        type = "bool-setting",
+        name = "ribbon-maze-uranium-ore",
+        setting_type = "runtime-global",
+        default_value = true,
+        order="rb-lu",
+    },
+    {
+        type = "bool-setting",
+        name = "ribbon-maze-crude-oil",
+        setting_type = "runtime-global",
+        default_value = true,
+        order="rb-lc",
     },
     {
         type = "bool-setting",

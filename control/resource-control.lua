@@ -337,6 +337,8 @@ function createRibbonMazeConfig()
         -- Maximum is just some defensive programming; the maze algorithm should actually be very efficient
         mazeMaxWidthChunks = 70,
 
+        mazeBlockSize = settingsGlobal["ribbon-maze-block-size"].value,
+
         -- Make sure resources like oil and uranium appear with in a tolerable distance, and optionally reveal their
         -- location so that people can assess if they are happy with the map
         ensureResources = ensureResources,

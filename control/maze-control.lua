@@ -23,7 +23,7 @@
 require("lib.cmwc")
 require("lib.maze")
 
-local function calculateMazePosition(modSurfaceInfo, coordinates)
+local function calculateMazePosition(config, modSurfaceInfo, coordinates)
 
     local topX
     local topY
@@ -36,21 +36,32 @@ local function calculateMazePosition(modSurfaceInfo, coordinates)
         topY = coordinates.y
     end
 
-    local mazeX = 1 + modSurfaceInfo.mapOffset + (topX / 32)
-    local mazeY = 1 + (-topY / 32)
+    local mazeX = math.ceil(1 + modSurfaceInfo.mapOffset + (topX / config.mazeBlockSize))
+    local mazeY = math.ceil(1 + (-topY / config.mazeBlockSize))
 
     return {x = mazeX, y = mazeY}
 end
 
-local function calculateChunkPositionFromMazeCoordinates(modSurfaceInfo, mazeCoordinates)
+local function calculateChunkPositionFromMazeCoordinates(config, modSurfaceInfo, mazeCoordinates)
 
-    local topX = (mazeCoordinates.x - (1 + modSurfaceInfo.mapOffset)) * 32
-    local topY = -(mazeCoordinates.y - 1) * 32
+    local topX = (mazeCoordinates.x - (1 + modSurfaceInfo.mapOffset)) * config.mazeBlockSize
+    local topY = -(mazeCoordinates.y - 1) * config.mazeBlockSize
 
     if modSurfaceInfo.mazeInfo.swapXY then
-        return {x = topY, y = -topX}
+        return {x = -topY - (config.mazeBlockSize - 32), y = topX - (config.mazeBlockSize - 32)}
     else
-        return {x = topX, y = topY}
+        return {x = topX - (config.mazeBlockSize - 32), y = topY}
+    end
+end
+
+local function isFirstMazeWaterRowEdge(config, modSurfaceInfo, coordinates)
+
+    if modSurfaceInfo.mazeInfo.swapXY then
+        local x = 1 + (-coordinates.x / config.mazeBlockSize)
+        return math.ceil(x) == x
+    else
+        local y = 1 + (-coordinates.y / config.mazeBlockSize)
+        return math.ceil(y) == y
     end
 end
 
@@ -224,7 +235,7 @@ local function initModSurfaceInfo(config, surface, modSurfaceInfo)
         modSurfaceInfo.corridorStats[c] = 0
     end
 
-    modSurfaceInfo.mazeStartCoordinates = calculateMazePosition(modSurfaceInfo, {x = 0, y = 0})
+    modSurfaceInfo.mazeStartCoordinates = calculateMazePosition(config, modSurfaceInfo, {x = 0, y = 0})
 
     if config.terraformingPrototypesEnabled then
         local mangroveRng = Cmwc.deriveNew(modSurfaceInfo.masterRng)
@@ -267,7 +278,7 @@ function ribbonMazeChunkGeneratedEventHandler(event)
     end
 
     -- decide what we want this chunk to have; we use the same data for all tiles in the chunk
-    local mazePosition = calculateMazePosition(modSurfaceInfo, chunkArea.left_top)
+    local mazePosition = calculateMazePosition(config, modSurfaceInfo, chunkArea.left_top)
 
     local x = mazePosition.x
     local y = mazePosition.y
@@ -302,7 +313,9 @@ function ribbonMazeChunkGeneratedEventHandler(event)
         end
         surface.set_tiles(updatedTiles)
 
-        if config.terraformingPrototypesEnabled and modSurfaceInfo.firstMazeRowMangroveRng[x] then
+        if isFirstMazeWaterRowEdge(config, modSurfaceInfo, chunkArea.left_top) and
+                config.terraformingPrototypesEnabled and
+                modSurfaceInfo.firstMazeRowMangroveRng[x] then
             if tileName == config.waterTile then
                 if modSurfaceInfo.mazeInfo.swapXY then
                     for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+30 do
@@ -555,10 +568,10 @@ function ribbonMazePlayerCreatedEventHander(event)
 
     for k,v in pairs(config.ensureResources) do
         if v.reveal and modSurfaceInfo.firstResource[k] then
-            local firstResourcePos = calculateChunkPositionFromMazeCoordinates(modSurfaceInfo, modSurfaceInfo.firstResource[k])
+            local firstResourcePos = calculateChunkPositionFromMazeCoordinates(config, modSurfaceInfo, modSurfaceInfo.firstResource[k])
             local firstResourceX = firstResourcePos.x
             local firstResourceY = firstResourcePos.y
-            player.force.chart(surface, {{firstResourceX, firstResourceY}, {firstResourceX+31, firstResourceY+31}})
+            player.force.chart(surface, {{firstResourceX, firstResourceY}, {firstResourceX+config.mazeBlockSize-1, firstResourceY+config.mazeBlockSize-1}})
         end
     end
 end
@@ -583,10 +596,10 @@ local function resourceScanning(research, resourceName)
                         local coordinates = {x=findX, y=findY}
                         local resource = resourceAt(config, surface, modSurfaceInfo, coordinates)
                         if resource and resource.resourceName == resourceName then
-                            local resourcePos = calculateChunkPositionFromMazeCoordinates(modSurfaceInfo, coordinates)
+                            local resourcePos = calculateChunkPositionFromMazeCoordinates(config, modSurfaceInfo, coordinates)
                             local resourceX = resourcePos.x
                             local resourceY = resourcePos.y
-                            force.chart(surface, {{resourceX, resourceY}, {resourceX+31, resourceY+31}})
+                            force.chart(surface, {{resourceX, resourceY}, {resourceX+config.mazeBlockSize-1, resourceY+config.mazeBlockSize-1}})
                         end
                     end
                 end
