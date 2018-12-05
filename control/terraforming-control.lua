@@ -65,39 +65,43 @@ function mazeTerraformingResultHandler(event)
 
     if event.entity.name == "maze-terraforming-result" then
         local surface = event.entity.surface
-        local position = event.entity.position
-        local updatedTiles = {}
-        for _, templatePos in pairs(circleTemplate) do
-            local tileX = position.x+templatePos[1]
-            local tileY = position.y+templatePos[2]
-            if surface.get_tile(tileX, tileY).name == config.mazeWallTile then
-                table.insert(updatedTiles, {name = config.waterTile, position = {tileX, tileY}})
-            end
-        end
-
-        surface.set_tiles(updatedTiles)
-
-        local modSurfaceInfo = global.modSurfaceInfo[surface.name]
-        for _, templatePos in pairs(circleTemplate) do
-            local tileX = position.x+templatePos[1]
-            local tileY = position.y+templatePos[2]
-            if terraformingEdge(config, surface, tileX, tileY) then
-                local randMangrove = Cmwc.randFraction(modSurfaceInfo.terraformingMangroveRng)
-                if randMangrove > 0.9 then
-                    surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
-                elseif randMangrove > 0.5 then
-                    surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+        local target = surface.find_entity("maze-terraforming-target", event.entity.position)
+        if target then
+            local position = target.position
+            local updatedTiles = {}
+            for _, templatePos in pairs(circleTemplate) do
+                local tileX = position.x+templatePos[1]
+                local tileY = position.y+templatePos[2]
+                if surface.get_tile(tileX, tileY).name == config.mazeWallTile then
+                    table.insert(updatedTiles, {name = config.waterTile, position = {tileX, tileY}})
                 end
             end
-        end
 
-        -- entities should be destroyed while setting the tiles due to collisions, but ensure their removal:
-        if event.entity.valid then
-            event.entity.destroy()
-        end
-        local target = surface.find_entity("maze-terraforming-target", position)
-        if target and target.valid then
-            target.destroy()
+            surface.set_tiles(updatedTiles)
+
+            local modSurfaceInfo = global.modSurfaceInfo[surface.name]
+            for _, templatePos in pairs(circleTemplate) do
+                local tileX = position.x+templatePos[1]
+                local tileY = position.y+templatePos[2]
+                if terraformingEdge(config, surface, tileX, tileY) then
+                    local randMangrove = Cmwc.randFraction(modSurfaceInfo.terraformingMangroveRng)
+                    if randMangrove > 0.9 then
+                        surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
+                    elseif randMangrove > 0.5 then
+                        surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                    end
+                end
+            end
+
+            -- the event entity should be destroyed while setting the tiles due to collisions, but ensure their removal:
+            if event.entity.valid then
+                event.entity.destroy()
+            end
+
+            -- the target does not collide with water, and must be removed by force:
+            if target.valid then
+                target.destroy()
+            end
         end
     end
 end
