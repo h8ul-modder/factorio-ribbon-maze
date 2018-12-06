@@ -52,12 +52,19 @@ data:extend{
         order="rb-e",
     },
     {
+        type = "bool-setting",
+        name = "ribbon-maze-mixed-preferred",
+        setting_type = "runtime-global",
+        default_value = false,
+        order="rb-f-a",
+    },
+    {
         type = "int-setting",
         name = "ribbon-maze-mixed-patchwork-min",
         setting_type = "runtime-global",
         default_value = 1,
         allowed_values = {1,2,3,5,6,10,15},
-        order="rb-f",
+        order="rb-f-b",
     },
     {
         type = "int-setting",
@@ -65,7 +72,7 @@ data:extend{
         setting_type = "runtime-global",
         default_value = 15,
         allowed_values = {1,2,3,5,6,10,15},
-        order="rb-g",
+        order="rb-f-c",
     },
     {
         type = "double-setting",

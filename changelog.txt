@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.6.7
-Date: 04. 12. 2018
+Date: 06. 12. 2018
   Major Features:
     - Mod ores can now be put at dead ends like vanilla ores. Supports practically any mod, with manual fine-tuning for popular mods such as
       Bob's Ores, Angel's Refining, Angel's Infinite Ores, Yuoki Industries, and more. Enable with the "Dead end mod resources" setting.

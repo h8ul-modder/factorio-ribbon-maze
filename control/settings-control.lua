@@ -270,17 +270,25 @@ function createRibbonMazeConfig()
     resourceMatrix[8] = {}
     resourceMatrix[10] = {}
 
+    local mixedOresPreferred = settingsGlobal["ribbon-maze-mixed-preferred"].value
+
     -- initial resources, hardcoded to ensure they take the first available corridor of the given depth:
-    if deadEndEnabled(settingsGlobal, "iron-ore") then
-        table.insert(resourceMatrix[2], "iron-ore")
-    end
+    if mixedOresPreferred then
+        table.insert(resourceMatrix[2], "mixed_")
+        table.insert(resourceMatrix[4], "mixed_")
+        table.insert(resourceMatrix[6], "mixed_")
+    else
+        if deadEndEnabled(settingsGlobal, "iron-ore") then
+            table.insert(resourceMatrix[2], "iron-ore")
+        end
 
-    if deadEndEnabled(settingsGlobal, "coal") then
-        table.insert(resourceMatrix[4], "coal")
-    end
+        if deadEndEnabled(settingsGlobal, "coal") then
+            table.insert(resourceMatrix[4], "coal")
+        end
 
-    if deadEndEnabled(settingsGlobal, "copper-ore") then
-        table.insert(resourceMatrix[6], "copper-ore")
+        if deadEndEnabled(settingsGlobal, "copper-ore") then
+            table.insert(resourceMatrix[6], "copper-ore")
+        end
     end
 
     if deadEndEnabled(settingsGlobal, "crude-oil") then
@@ -304,15 +312,22 @@ function createRibbonMazeConfig()
 
     for name,prototype in pairs(game.entity_prototypes) do
         if deadEndEnabled(settingsGlobal, name) then
+
             resources[name] = true
+            local mixedOreStrength = mixedOreStrengths[name] or guessMixedOreStrength(name)
+
             local resourceCorridorDepth = resourceCorridorDepths[name] or guessResourceCorridorDepths(name)
             for _,depth in pairs(resourceCorridorDepth) do
                 if not resourceMatrix[depth] then
                     resourceMatrix[depth] = {}
                 end
-                table.insert(resourceMatrix[depth], name)
+                if mixedOresPreferred and mixedOreStrength > 0 then
+                    table.insert(resourceMatrix[depth], "mixed_")
+                else
+                    table.insert(resourceMatrix[depth], name)
+                end
             end
-            local mixedOreStrength = mixedOreStrengths[name] or guessMixedOreStrength(name)
+
             for i=1,mixedOreStrength do
                 table.insert(mixedResources, name)
             end
