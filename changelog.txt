@@ -13,6 +13,8 @@ Date: 04. 12. 2018
     - Reduce frequency of Mangrove (Bruguiera) by half. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/17)
   Bugfixes:
     - Mangrove (Bruguiera) not removed in terraforming. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/16)
+    - Maze terraforming collision mask fix. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/23)
+    - Oil spacing changed in existing saves. NOTE: you'll need to move your pumpjacks! (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/25)
 ---------------------------------------------------------------------------------------------------
 Version: 0.6.6
 Date: 30. 11. 2018
