@@ -207,6 +207,49 @@ local function guessResourceCorridorDepths(resource)
     end
 end
 
+local function fitDivisor30(startSize)
+    for i = startSize,30,1 do
+        if 30 % i == 0 then
+            return i
+        end
+    end
+    return startSize
+end
+
+local function resourceAlignment(resource)
+    local prototype = game.entity_prototypes[resource]
+    local collisionBox = prototype.collision_box
+    local sizeX = math.ceil(collisionBox.right_bottom.x - collisionBox.left_top.x)
+    local sizeY = math.ceil(collisionBox.right_bottom.y - collisionBox.left_top.y)
+    -- don't both if it can fit in a single tile
+    if sizeX <= 1 and sizeY <= 1 then
+        return nil
+    end
+
+    -- room for pipes (most large resources need them)
+    sizeX = sizeX + 1
+    sizeY = sizeY + 1
+
+    -- fit equally in the 30x30 tile:
+    sizeX = fitDivisor30(sizeX)
+    sizeY = fitDivisor30(sizeY)
+
+    local offsetX = math.ceil(-collisionBox.left_top.x)
+    local offsetY = math.ceil(-collisionBox.left_top.y)
+
+    local xPositions = {}
+    local yPositions = {}
+
+    for x = 0,(30-sizeX),sizeX do
+        xPositions[x+offsetX] = true
+    end
+    for y = 0,(30-sizeY),sizeY do
+        yPositions[y+offsetY] = true
+    end
+
+    return {xPositions = xPositions, yPositions = yPositions}
+end
+
 -- This function must be called createRibbonMazeConfig(). It is recommended to use only settings, but global/game are
 -- also available. It can be relatively expensive because it is only run on settings/configuration change.
 function createRibbonMazeConfig()
@@ -311,6 +354,14 @@ function createRibbonMazeConfig()
 
     local clearMazeStartChunks = settingsGlobal["ribbon-maze-clear-start"].value
 
+    local resourceAlignments = {}
+    for r,_ in pairs(resources) do
+        local alignment = resourceAlignment(r)
+        if alignment then
+            resourceAlignments[r] = alignment
+        end
+    end
+
     return {
         -- True if terraforming prototypes are available, in which case entities and forces will be created to allow
         -- automated terraforming with artillery
@@ -346,6 +397,7 @@ function createRibbonMazeConfig()
         -- The ores which are controlled by the mod. Only resources in this table will be added to dead ends and
         -- forcibly removed from other locations.
         resources = resources,
+        resourceAlignments = resourceAlignments,
         resourceStretchFactor = settingsGlobal["ribbon-maze-resource-stretch-factor"].value,
 
         -- Infinite equivalents of ores, to place them at the centre of resource patches

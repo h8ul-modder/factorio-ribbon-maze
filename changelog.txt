@@ -9,12 +9,16 @@ Date: 04. 12. 2018
   Features:
     - Settings to control how infinite ores from mods are handled. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/20)
     - Setting to stretch out resource richness increase. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/21)
+    - Even more better improved spacing for oil and other resources with multi-tile collision boxes. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/27)
   Balance:
     - Reduce frequency of Mangrove (Bruguiera) by half. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/17)
+    - Less individual oil entities now that the minimum is 20%.
   Bugfixes:
     - Mangrove (Bruguiera) not removed in terraforming. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/16)
     - Maze terraforming collision mask fix. (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/23)
     - Oil spacing changed in existing saves. NOTE: you'll need to move your pumpjacks! (https://github.com/h8ul-modder/factorio-ribbon-maze/issues/25)
+  Optimisations:
+    - Multi-tile resource alignment is now calculated at configuration time rather than at chunk generation.
 ---------------------------------------------------------------------------------------------------
 Version: 0.6.6
 Date: 30. 11. 2018

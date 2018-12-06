@@ -275,8 +275,7 @@ function ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkPosit
         local mixedBag
         local patchworkSize
 
-        local sizeX
-        local sizeY
+        local alignment
         local minimumAmount
 
         local infiniteReplacement
@@ -302,14 +301,7 @@ function ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkPosit
             end
         else
             local collisionBox = game.entity_prototypes[resourceName].collision_box
-            sizeX = math.ceil(collisionBox.right_bottom.x - collisionBox.left_top.x)
-            sizeY = math.ceil(collisionBox.right_bottom.y - collisionBox.left_top.y)
-            if (sizeX > 1) then
-                sizeX = sizeX + 1
-            end
-            if (sizeY > 1) then
-                sizeY = sizeY + 1
-            end
+            alignment = config.resourceAlignments[resourceName]
             minimumAmount = game.entity_prototypes[resourceName].minimum_resource_amount or 100
 
             if config.infiniteOres then
@@ -400,7 +392,7 @@ function ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkPosit
                         end
                     end
 
-                    if amount >= 1 and tileYOffset % sizeY == 0 and tileXOffset % sizeX == 0 then
+                    if amount >= 1 and ((not alignment) or (alignment.xPositions[tileXOffset] and alignment.yPositions[tileYOffset])) then
                         surface.create_entity{
                             name=thisTileResource,
                             amount=amount,
