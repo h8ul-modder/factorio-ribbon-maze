@@ -24,7 +24,7 @@
 -- Settings and configuration caching --
 ----------------------------------------
 
-local function updateRibbonMazeConfig()
+function updateRibbonMazeConfig()
 
     --
     -- create config object
@@ -55,14 +55,4 @@ end
 -- Accessor function used throughout the mod:
 function ribbonMazeConfig()
     return global.ribbonMazeConfig or updateRibbonMazeConfig()
-end
-
--- register with script.on_configuration_changed(ribbonMazeConfigurationChanged):
-function ribbonMazeConfigurationChanged()
-    updateRibbonMazeConfig()
-end
-
--- register with script.on_event(defines.events.on_runtime_mod_setting_changed, ribbonMazeModSettingChanged):
-function ribbonMazeModSettingChanged()
-    updateRibbonMazeConfig()
 end

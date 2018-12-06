@@ -20,19 +20,11 @@
    SOFTWARE.
 --]]
 
------------------------------
--- Require resource config --
------------------------------
-require "control.resource-control"
-
------------------------------------------
--- Require and register config caching --
------------------------------------------
-
+-----------------------------------
+-- Functions to process settings --
+-----------------------------------
+require "control.settings-control"
 require "control.config-control"
-
-script.on_configuration_changed(ribbonMazeConfigurationChanged)
-script.on_event(defines.events.on_runtime_mod_setting_changed, ribbonMazeModSettingChanged)
 
 ----------------------------------------------------
 -- Require and register the maze control handlers --
@@ -55,3 +47,17 @@ require "control.terraforming-control"
 script.on_event(defines.events.on_built_entity, mazeTerraformingArtillerybuiltHandler)
 script.on_event(defines.events.on_robot_built_entity, mazeTerraformingArtillerybuiltHandler)
 script.on_event(defines.events.on_trigger_created_entity, mazeTerraformingResultHandler)
+
+----------------------
+-- Custom commands  --
+----------------------
+
+
+------------------------------------------------------------------------------------------
+-- control.lua runtime "migrations" i.e. ones not suited to builtin factorio migrations --
+------------------------------------------------------------------------------------------
+
+require "control.migration-control"
+
+script.on_configuration_changed(ribbonMazeConfigurationChanged)
+script.on_event(defines.events.on_runtime_mod_setting_changed, ribbonMazeModSettingChanged)

@@ -23,7 +23,7 @@
 require("lib.cmwc")
 require("lib.maze")
 
-local function calculateMazePosition(config, modSurfaceInfo, coordinates)
+function calculateMazePosition(config, modSurfaceInfo, coordinates)
 
     local topX
     local topY
@@ -36,8 +36,15 @@ local function calculateMazePosition(config, modSurfaceInfo, coordinates)
         topY = coordinates.y
     end
 
-    local mazeX = math.ceil(1 + modSurfaceInfo.mapOffset + (topX / config.mazeBlockSize))
-    local mazeY = math.ceil(1 + (-topY / config.mazeBlockSize))
+    local mazeX
+    local mazeY
+    if config.mazeBlockSize == 32 then
+        mazeX = 1 + modSurfaceInfo.mapOffset + (topX / config.mazeBlockSize)
+        mazeY = 1 + (-topY / config.mazeBlockSize)
+    else
+        mazeX = math.ceil(1 + modSurfaceInfo.mapOffset + (topX / config.mazeBlockSize))
+        mazeY = math.ceil(1 + (-topY / config.mazeBlockSize))
+    end
 
     return {x = mazeX, y = mazeY}
 end
@@ -138,7 +145,7 @@ local function calculateResource(config, surface, modSurfaceInfo, x, y)
     row[x] = resource
 end
 
-local function resourceAt(config, surface, modSurfaceInfo, coordinates)
+function resourceAt(config, surface, modSurfaceInfo, coordinates)
 
     while coordinates.y > modSurfaceInfo.resourceGridCalculatedTo do
         for x = 1, modSurfaceInfo.maze.numColumns do
@@ -253,6 +260,159 @@ local function initModSurfaceInfo(config, surface, modSurfaceInfo)
     end
 
     modSurfaceInfo.initComplete = true
+end
+
+function ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkPosition, mazePosition)
+
+    local resource = resourceAt(config, surface, modSurfaceInfo, mazePosition)
+
+    if resource and resource.resourceName then
+
+        local resourceName = resource.resourceName
+
+        local chunkRandomAdjustment = Cmwc.randFractionRange(resource.rng, resource.minRand, 1.0)
+
+        local mixedBag
+        local patchworkSize
+
+        local sizeX
+        local sizeY
+        local minimumAmount
+
+        local infiniteReplacement
+        local infiniteMinimumAmount
+        local infiniteReplacementAreaMin
+        local infiniteReplacementAreaMax
+
+        if resourceName == "mixed_" then
+            mixedBag = {table.unpack(config.forcedMixedResources) }
+            if config.minMixedResourcesPatchworkSize ~= config.maxMixedResourcesPatchworkSize then
+
+                local mixedResourcesPatchworkSizes = {}
+                for p = config.minMixedResourcesPatchworkSize, config.maxMixedResourcesPatchworkSize do
+                    if 30 % p == 0 then
+                        table.insert(mixedResourcesPatchworkSizes, p)
+                    end
+                end
+
+                local patchworkSizeIndex = Cmwc.randRange(resource.rng, 1, #mixedResourcesPatchworkSizes)
+                patchworkSize = mixedResourcesPatchworkSizes[patchworkSizeIndex]
+            else
+                patchworkSize = config.minMixedResourcesPatchworkSize
+            end
+        else
+            local collisionBox = game.entity_prototypes[resourceName].collision_box
+            sizeX = math.ceil(collisionBox.right_bottom.x - collisionBox.left_top.x)
+            sizeY = math.ceil(collisionBox.right_bottom.y - collisionBox.left_top.y)
+            if (sizeX > 1) then
+                sizeX = sizeX + 1
+            end
+            if (sizeY > 1) then
+                sizeY = sizeY + 1
+            end
+            minimumAmount = game.entity_prototypes[resourceName].minimum_resource_amount or 100
+
+            if config.infiniteOres then
+                infiniteReplacement = config.infiniteOres[resourceName]
+                if infiniteReplacement then
+                    infiniteMinimumAmount = game.entity_prototypes[infiniteReplacement].minimum_resource_amount or 100
+                    local infiniteReplacementSize = math.floor(Maze.deadEnd(modSurfaceInfo.maze, mazePosition.x, mazePosition.y).yHighest / config.infiniteOreStretchFactor)
+                    if infiniteReplacementSize < 1 then
+                        infiniteReplacement = nil
+                    elseif infiniteReplacementSize > 11 then
+                        infiniteReplacementSize = 11
+                    end
+                    if infiniteReplacement then
+                        infiniteReplacementSize = infiniteReplacementSize - 1
+                        infiniteReplacementAreaMin = 14-infiniteReplacementSize
+                        infiniteReplacementAreaMax = 15+infiniteReplacementSize
+                    end
+                end
+            end
+        end
+
+        for tileY = chunkPosition.y+1, chunkPosition.y+30 do
+
+            for tileX = chunkPosition.x+1, chunkPosition.x+30 do
+
+                local resourceName = resource.resourceName
+
+                if resourceName == "mixed_" then
+
+                    local moduloX = (tileX-(chunkPosition.x+1)) % patchworkSize
+                    local moduloY = (tileY-(chunkPosition.y+1)) % patchworkSize
+                    if (moduloX == 0 and moduloY == 0) then
+                        local randomOre
+                        if #mixedBag > 0 then
+                            local randomOreIndex = Cmwc.randRange(resource.rng, 1, #mixedBag)
+                            randomOre = mixedBag[randomOreIndex]
+                            table.remove(mixedBag, randomOreIndex)
+                        else
+                            local randomOreIndex = Cmwc.randRange(resource.rng, 1, #config.mixedResources)
+                            randomOre = config.mixedResources[randomOreIndex]
+                        end
+
+                        if randomOre then
+                            for randomOreX=tileX,tileX+patchworkSize-1 do
+                                for randomOreY=tileY,tileY+patchworkSize-1 do
+
+                                    local tileRandomAdjustment = Cmwc.randFractionRange(resource.rng, resource.minRand, 1.0)
+                                    local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
+                                    amount = amount * config.mixedResourcesMultiplier
+                                    minimumAmount = game.entity_prototypes[randomOre].minimum_resource_amount or 100
+                                    if amount < minimumAmount then
+                                        amount = amount + minimumAmount
+                                    end
+                                    if amount >= 1 then
+                                        surface.create_entity{
+                                            name=randomOre,
+                                            amount=amount,
+                                            initial_amount=amount,
+                                            position={randomOreX, randomOreY},
+                                            enable_tree_removal=true,
+                                            enable_cliff_removal=true}
+                                    end
+                                end
+                            end
+                        end
+                    end
+                else
+                    local tileRandomAdjustment = Cmwc.randFractionRange(resource.rng, resource.minRand, 1.0)
+
+                    local tileYOffset = tileY-(chunkPosition.y+1)
+                    local tileXOffset = tileX-(chunkPosition.x+1)
+
+                    local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
+                    local thisTileResource = resourceName
+
+                    if infiniteReplacement and
+                            tileYOffset >= infiniteReplacementAreaMin and
+                            tileYOffset <= infiniteReplacementAreaMax and
+                            tileXOffset >= infiniteReplacementAreaMin and
+                            tileXOffset <= infiniteReplacementAreaMax then
+                        thisTileResource = infiniteReplacement
+                        if amount < infiniteMinimumAmount then
+                            amount = infiniteMinimumAmount + amount
+                        end
+                    else
+                        if amount < minimumAmount then
+                            amount = minimumAmount + amount
+                        end
+                    end
+
+                    if amount >= 1 and tileYOffset % sizeY == 0 and tileXOffset % sizeX == 0 then
+                        surface.create_entity{
+                            name=thisTileResource,
+                            amount=amount,
+                            initial_amount=amount,
+                            position={tileX, tileY},
+                            enable_tree_removal=true,
+                            enable_cliff_removal=true}
+                    end
+                end
+            end
+        end
+    end
 end
 
 function ribbonMazeChunkGeneratedEventHandler(event)
@@ -391,155 +551,7 @@ function ribbonMazeChunkGeneratedEventHandler(event)
         return
     end
 
-    local resource = resourceAt(config, surface, modSurfaceInfo, mazePosition)
-
-    if resource and resource.resourceName then
-
-        local resourceName = resource.resourceName
-
-        local chunkRandomAdjustment = Cmwc.randFractionRange(resource.rng, resource.minRand, 1.0)
-
-        local mixedBag
-        local patchworkSize
-
-        local sizeX
-        local sizeY
-        local minimumAmount
-
-        local infiniteReplacement
-        local infiniteMinimumAmount
-        local infiniteReplacementAreaMin
-        local infiniteReplacementAreaMax
-
-        if resourceName == "mixed_" then
-            mixedBag = {table.unpack(config.forcedMixedResources) }
-            if config.minMixedResourcesPatchworkSize ~= config.maxMixedResourcesPatchworkSize then
-
-                local mixedResourcesPatchworkSizes = {}
-                for p = config.minMixedResourcesPatchworkSize, config.maxMixedResourcesPatchworkSize do
-                    if 30 % p == 0 then
-                        table.insert(mixedResourcesPatchworkSizes, p)
-                    end
-                end
-
-                local patchworkSizeIndex = Cmwc.randRange(resource.rng, 1, #mixedResourcesPatchworkSizes)
-                patchworkSize = mixedResourcesPatchworkSizes[patchworkSizeIndex]
-            else
-                patchworkSize = config.minMixedResourcesPatchworkSize
-            end
-        else
-            local collisionBox = game.entity_prototypes[resourceName].collision_box
-            sizeX = math.ceil(collisionBox.right_bottom.x - collisionBox.left_top.x)
-            sizeY = math.ceil(collisionBox.right_bottom.y - collisionBox.left_top.y)
-            if (sizeX > 1) then
-                sizeX = sizeX + 1
-            end
-            if (sizeY > 1) then
-                sizeY = sizeY + 1
-            end
-            minimumAmount = game.entity_prototypes[resourceName].minimum_resource_amount or 100
-
-            if config.infiniteOres then
-                infiniteReplacement = config.infiniteOres[resourceName]
-                if infiniteReplacement then
-                    infiniteMinimumAmount = game.entity_prototypes[infiniteReplacement].minimum_resource_amount or 100
-                    local infiniteReplacementSize = math.floor(Maze.deadEnd(modSurfaceInfo.maze, x, y).yHighest / config.infiniteOreStretchFactor)
-                    if infiniteReplacementSize < 1 then
-                        infiniteReplacement = nil
-                    elseif infiniteReplacementSize > 11 then
-                        infiniteReplacementSize = 11
-                    end
-                    if infiniteReplacement then
-                        infiniteReplacementSize = infiniteReplacementSize - 1
-                        infiniteReplacementAreaMin = 14-infiniteReplacementSize
-                        infiniteReplacementAreaMax = 15+infiniteReplacementSize
-                    end
-                end
-            end
-        end
-
-        for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+30 do
-
-            for tileX = chunkArea.left_top.x+1, chunkArea.left_top.x+30 do
-
-                local resourceName = resource.resourceName
-
-                if resourceName == "mixed_" then
-
-                    local moduloX = (tileX-(chunkArea.left_top.x+1)) % patchworkSize
-                    local moduloY = (tileY-(chunkArea.left_top.y+1)) % patchworkSize
-                    if (moduloX == 0 and moduloY == 0) then
-                        local randomOre
-                        if #mixedBag > 0 then
-                            local randomOreIndex = Cmwc.randRange(resource.rng, 1, #mixedBag)
-                            randomOre = mixedBag[randomOreIndex]
-                            table.remove(mixedBag, randomOreIndex)
-                        else
-                            local randomOreIndex = Cmwc.randRange(resource.rng, 1, #config.mixedResources)
-                            randomOre = config.mixedResources[randomOreIndex]
-                        end
-
-                        if randomOre then
-                            for randomOreX=tileX,tileX+patchworkSize-1 do
-                                for randomOreY=tileY,tileY+patchworkSize-1 do
-
-                                    local tileRandomAdjustment = Cmwc.randFractionRange(resource.rng, resource.minRand, 1.0)
-                                    local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
-                                    amount = amount * config.mixedResourcesMultiplier
-                                    minimumAmount = game.entity_prototypes[randomOre].minimum_resource_amount or 100
-                                    if amount < minimumAmount then
-                                        amount = amount + minimumAmount
-                                    end
-                                    if amount >= 1 then
-                                        surface.create_entity{
-                                            name=randomOre,
-                                            amount=amount,
-                                            initial_amount=amount,
-                                            position={randomOreX, randomOreY},
-                                            enable_tree_removal=true,
-                                            enable_cliff_removal=true}
-                                    end
-                                end
-                            end
-                        end
-                    end
-                else
-                    local tileRandomAdjustment = Cmwc.randFractionRange(resource.rng, resource.minRand, 1.0)
-
-                    local tileYOffset = tileY-(chunkArea.left_top.y+1)
-                    local tileXOffset = tileX-(chunkArea.left_top.x+1)
-
-                    local amount = chunkRandomAdjustment * tileRandomAdjustment * resource.resourceAmount
-                    local thisTileResource = resourceName
-
-                    if infiniteReplacement and
-                            tileYOffset >= infiniteReplacementAreaMin and
-                            tileYOffset <= infiniteReplacementAreaMax and
-                            tileXOffset >= infiniteReplacementAreaMin and
-                            tileXOffset <= infiniteReplacementAreaMax then
-                        thisTileResource = infiniteReplacement
-                        if amount < infiniteMinimumAmount then
-                            amount = infiniteMinimumAmount + amount
-                        end
-                    else
-                        if amount < minimumAmount then
-                            amount = minimumAmount + amount
-                        end
-                    end
-
-                    if amount >= 1 and tileYOffset % sizeY == 0 and tileXOffset % sizeX == 0 then
-                        surface.create_entity{
-                            name=thisTileResource,
-                            amount=amount,
-                            initial_amount=amount,
-                            position={tileX, tileY},
-                            enable_tree_removal=true,
-                            enable_cliff_removal=true}
-                    end
-                end
-            end
-        end
-    end
+    ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkArea.left_top, mazePosition)
 
 end
 
