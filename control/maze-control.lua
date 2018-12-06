@@ -415,6 +415,10 @@ function ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkPosit
     end
 end
 
+function isOutOfMap(modSurfaceInfo, mazePosition)
+    return mazePosition.y < 0 or mazePosition.x < 0 or mazePosition.x > modSurfaceInfo.maze.numColumns+1
+end
+
 function ribbonMazeChunkGeneratedEventHandler(event)
 
     local config = ribbonMazeConfig()
@@ -443,7 +447,7 @@ function ribbonMazeChunkGeneratedEventHandler(event)
     local x = mazePosition.x
     local y = mazePosition.y
 
-    if y < 0 or x < 0 or x > modSurfaceInfo.maze.numColumns+1 then
+    if isOutOfMap(modSurfaceInfo, mazePosition) then
         local updatedTiles = {}
         for tileX = chunkArea.left_top.x, chunkArea.left_top.x+31 do
             for tileY = chunkArea.left_top.y, chunkArea.left_top.y+31 do

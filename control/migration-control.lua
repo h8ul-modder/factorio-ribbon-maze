@@ -27,19 +27,36 @@ local function fixes_0_6_7()
         local modSurfaceInfo = global.modSurfaceInfo[surface.name]
         if modSurfaceInfo then
             for chunkPosition in surface.get_chunks() do
+                local chunkTilePosition = {x = chunkPosition.x*32, y=chunkPosition.y*32}
+
+                local mazePosition = calculateMazePosition(config, modSurfaceInfo, chunkTilePosition)
 
                 -- fix crude oil placement
                 if config.resources["crude-oil"] then
-                    local mazePosition = calculateMazePosition(config, modSurfaceInfo, chunkPosition)
-
                     local resource = resourceAt(config, surface, modSurfaceInfo, mazePosition)
                     if resource and resource.resourceName and resource.resourceName == "crude-oil" then
-                        local chunkArea = {left_top = chunkPosition, right_bottom = {x = chunkPosition.x+31, y = chunkPosition.y+31}}
+                        local chunkArea = {left_top = chunkTilePosition, right_bottom = {x = chunkTilePosition.x+31, y = chunkTilePosition.y+31}}
                         local resourcesToRemove = surface.find_entities_filtered{name="crude-oil", area=chunkArea}
                         for _, v in pairs(resourcesToRemove) do
                             v.destroy()
                         end
-                        ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkPosition, mazePosition)
+                        ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkTilePosition, mazePosition)
+                    end
+                end
+
+                -- fix terraforming targets
+                if config.terraformingPrototypesEnabled and (not isOutOfMap(modSurfaceInfo, mazePosition)) and Maze.wallTileAt(modSurfaceInfo.maze, mazePosition.x, mazePosition.y) then
+                    for tileX = chunkTilePosition.x+1, chunkTilePosition.x+29,4 do
+                        for tileY = chunkTilePosition.y+1, chunkTilePosition.y+29,4 do
+                            local tilePosition = {x=tileX,y=tileY}
+                            if surface.get_tile(tilePosition).name == config.mazeWallTile then
+                                local target = surface.find_entity("maze-terraforming-target", tilePosition)
+                                if not target then
+                                    target = surface.create_entity{name="maze-terraforming-target", position={tileX,tileY}, force="maze-terraforming-targets"}
+                                    target.destructible = false
+                                end
+                            end
+                        end
                     end
                 end
             end
