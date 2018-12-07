@@ -411,6 +411,50 @@ function isOutOfMap(modSurfaceInfo, mazePosition)
     return mazePosition.y < 0 or mazePosition.x < 0 or mazePosition.x > modSurfaceInfo.maze.numColumns+1
 end
 
+function generateMangroves(modSurfaceInfo, surface, chunkTilePosition, rng)
+    if modSurfaceInfo.mazeInfo.swapXY then
+        for tileY = chunkTilePosition.y+1, chunkTilePosition.y+30 do
+            for tileX = chunkTilePosition.x+32, chunkTilePosition.x+33 do
+                local randMangrove = Cmwc.randFraction(rng)
+                if randMangrove > 0.4 then
+                    surface.create_entity{name="mangrove-rhizophora", position={tileX,tileY}}
+                end
+            end
+        end
+
+        for tileY = chunkTilePosition.y+1, chunkTilePosition.y+30 do
+            for tileX = chunkTilePosition.x+30, chunkTilePosition.x+31 do
+                local randMangrove = Cmwc.randFraction(rng)
+                if randMangrove > 0.95 then
+                    surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
+                elseif randMangrove > 0.5 then
+                    surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                end
+            end
+        end
+    else
+        for tileX = chunkTilePosition.x+1, chunkTilePosition.x+30 do
+            for tileY = chunkTilePosition.y-1, chunkTilePosition.y do
+                local randMangrove = Cmwc.randFraction(rng)
+                if randMangrove > 0.4 then
+                    surface.create_entity{name="mangrove-rhizophora", position={tileX,tileY}}
+                end
+            end
+        end
+
+        for tileX = chunkTilePosition.x+1, chunkTilePosition.x+30 do
+            for tileY = chunkTilePosition.y+1, chunkTilePosition.y+2 do
+                local randMangrove = Cmwc.randFraction(rng)
+                if randMangrove > 0.95 then
+                    surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
+                elseif randMangrove > 0.5 then
+                    surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                end
+            end
+        end
+    end
+end
+
 function ribbonMazeChunkGeneratedEventHandler(event)
 
     local config = ribbonMazeConfig()
@@ -424,6 +468,7 @@ function ribbonMazeChunkGeneratedEventHandler(event)
     initModSurfaceInfo(config, surface, modSurfaceInfo)
 
     local chunkArea = event.area
+    local chunkTilePosition = chunkArea.left_top
 
     -- remove default generated resources
     local resourcesToRemove = surface.find_entities_filtered{type="resource", area=chunkArea}
@@ -434,15 +479,15 @@ function ribbonMazeChunkGeneratedEventHandler(event)
     end
 
     -- decide what we want this chunk to have; we use the same data for all tiles in the chunk
-    local mazePosition = calculateMazePosition(config, modSurfaceInfo, chunkArea.left_top)
+    local mazePosition = calculateMazePosition(config, modSurfaceInfo, chunkTilePosition)
 
     local x = mazePosition.x
     local y = mazePosition.y
 
     if isOutOfMap(modSurfaceInfo, mazePosition) then
         local updatedTiles = {}
-        for tileX = chunkArea.left_top.x, chunkArea.left_top.x+31 do
-            for tileY = chunkArea.left_top.y, chunkArea.left_top.y+31 do
+        for tileX = chunkTilePosition.x, chunkTilePosition.x+31 do
+            for tileY = chunkTilePosition.y, chunkTilePosition.y+31 do
                 table.insert(updatedTiles, {name = "out-of-map", position = {tileX, tileY}})
             end
         end
@@ -462,64 +507,23 @@ function ribbonMazeChunkGeneratedEventHandler(event)
             tileName = config.mazeWallTile
         end
 
-        for tileX = chunkArea.left_top.x, chunkArea.left_top.x+31 do
-            for tileY = chunkArea.left_top.y, chunkArea.left_top.y+31 do
+        for tileX = chunkTilePosition.x, chunkTilePosition.x+31 do
+            for tileY = chunkTilePosition.y, chunkTilePosition.y+31 do
                 table.insert(updatedTiles, {name = tileName, position = {tileX, tileY}})
             end
         end
         surface.set_tiles(updatedTiles)
 
-        if isFirstMazeWaterRowEdge(config, modSurfaceInfo, chunkArea.left_top) and
+        if tileName == config.waterTile and
+                isFirstMazeWaterRowEdge(config, modSurfaceInfo, chunkTilePosition) and
                 config.terraformingPrototypesEnabled and
                 modSurfaceInfo.firstMazeRowMangroveRng[x] then
-            if tileName == config.waterTile then
-                if modSurfaceInfo.mazeInfo.swapXY then
-                    for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+30 do
-                        for tileX = chunkArea.left_top.x+32, chunkArea.left_top.x+33 do
-                            local randMangrove = Cmwc.randFraction(modSurfaceInfo.firstMazeRowMangroveRng[x])
-                            if randMangrove > 0.4 then
-                                surface.create_entity{name="mangrove-rhizophora", position={tileX,tileY}}
-                            end
-                        end
-                    end
-
-                    for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+30 do
-                        for tileX = chunkArea.left_top.x+30, chunkArea.left_top.x+31 do
-                            local randMangrove = Cmwc.randFraction(modSurfaceInfo.firstMazeRowMangroveRng[x])
-                            if randMangrove > 0.95 then
-                                surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
-                            elseif randMangrove > 0.5 then
-                                surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
-                            end
-                        end
-                    end
-                else
-                    for tileX = chunkArea.left_top.x+1, chunkArea.left_top.x+30 do
-                        for tileY = chunkArea.left_top.y-1, chunkArea.left_top.y do
-                            local randMangrove = Cmwc.randFraction(modSurfaceInfo.firstMazeRowMangroveRng[x])
-                            if randMangrove > 0.4 then
-                                surface.create_entity{name="mangrove-rhizophora", position={tileX,tileY}}
-                            end
-                        end
-                    end
-
-                    for tileX = chunkArea.left_top.x+1, chunkArea.left_top.x+30 do
-                        for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+2 do
-                            local randMangrove = Cmwc.randFraction(modSurfaceInfo.firstMazeRowMangroveRng[x])
-                            if randMangrove > 0.95 then
-                                surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
-                            elseif randMangrove > 0.5 then
-                                surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
-                            end
-                        end
-                    end
-                end
-            elseif tileName == config.mazeWallTile then
-                for tileX = chunkArea.left_top.x+1, chunkArea.left_top.x+29,4 do
-                    for tileY = chunkArea.left_top.y+1, chunkArea.left_top.y+29,4 do
-                        local target = surface.create_entity{name="maze-terraforming-target", position={tileX,tileY}, force="maze-terraforming-targets"}
-                        target.destructible = false
-                    end
+            generateMangroves(modSurfaceInfo, surface, chunkTilePosition, modSurfaceInfo.firstMazeRowMangroveRng[x])
+        elseif tileName == config.mazeWallTile then
+            for tileX = chunkTilePosition.x+1, chunkTilePosition.x+29,4 do
+                for tileY = chunkTilePosition.y+1, chunkTilePosition.y+29,4 do
+                    local target = surface.create_entity{name="maze-terraforming-target", position={tileX,tileY}, force="maze-terraforming-targets"}
+                    target.destructible = false
                 end
             end
         end
@@ -529,8 +533,8 @@ function ribbonMazeChunkGeneratedEventHandler(event)
 
     local updatedTiles = {}
 
-    for tileX = chunkArea.left_top.x, chunkArea.left_top.x+31 do
-        for tileY = chunkArea.left_top.y, chunkArea.left_top.y+31 do
+    for tileX = chunkTilePosition.x, chunkTilePosition.x+31 do
+        for tileY = chunkTilePosition.y, chunkTilePosition.y+31 do
             local tile = surface.get_tile(tileX, tileY)
             local replacement = config.waterTileReplacement[tile.name]
             if replacement then
@@ -547,8 +551,7 @@ function ribbonMazeChunkGeneratedEventHandler(event)
         return
     end
 
-    ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkArea.left_top, mazePosition)
-
+    ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkTilePosition, mazePosition)
 end
 
 function ribbonMazePlayerCreatedEventHander(event)
