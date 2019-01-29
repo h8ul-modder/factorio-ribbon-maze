@@ -34,4 +34,6 @@ just providing a different control.lua should allow heavily customized setups, s
 Terrain graphics for maze adapted from the MIT-license More Floors mod by Tone
 (https://mods.factorio.com/mods/Tone/More_Floors).
 
+Thanks to illiander42 for various modifications.
+
 Thanks also to Factorio staff and forum users for their help and support!
