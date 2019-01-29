@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.6.8
+Date: 29. 01. 2019
+  Features:
+    - Merges options from illiander42's variant
+    - Fish added
+    - Loop chance option: Now your maze can have loops in it. Beware that adding loops reduces the number of dead ends, which means less resource patches.
+    - Clearings option: gives a chance for large open areas to spawn. These will almost certainly create loops even without the imperfect maze option.
+    - Oasis: Option to find mangrove-filled water at dead-ends, instead of ore or oil.
+    - Settings to control mangrove density and proportion of raw/green wood
+---------------------------------------------------------------------------------------------------
 Version: 0.6.7
 Date: 07. 12. 2018
   Major Features:

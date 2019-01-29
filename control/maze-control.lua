@@ -1,5 +1,6 @@
 --[[
    Copyright 2018 H8UL
+   Modifications Copyright 2019 Illiander
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to deal
@@ -126,7 +127,7 @@ local function calculateResource(config, surface, modSurfaceInfo, x, y)
 
     local resource = {}
 
-    if config.resources[choice] or choice == "mixed_" then
+    if config.resources[choice] or choice == "mixed_" or choice == "water_" then
         resource.resourceName = choice
         resource.minRand = 1.0 - (1.0 / (1+deadEnd.corridorLength/2))
         resource.rng = Cmwc.deriveNew(modSurfaceInfo.resourceGridRng)
@@ -232,7 +233,7 @@ local function initModSurfaceInfo(config, surface, modSurfaceInfo)
 
     local mazeRng = Cmwc.deriveNew(modSurfaceInfo.masterRng)
 
-    modSurfaceInfo.maze = Maze.new(mazeRng, chunks, 0.5, config.resourceMatrixMax)
+    modSurfaceInfo.maze = Maze.new(mazeRng, chunks, 0.5, config.resourceMatrixMax, config.loopChance, config.clearingChance, config.clearingSizeMax)
 
     modSurfaceInfo.resourceGrid = {}
     modSurfaceInfo.resourceGridCalculatedTo = 0
@@ -299,6 +300,8 @@ function ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkPosit
             else
                 patchworkSize = config.minMixedResourcesPatchworkSize
             end
+        elseif resourceName == "water_" then
+            -- do nothing
         else
             local collisionBox = game.entity_prototypes[resourceName].collision_box
             alignment = config.resourceAlignments[resourceName]
@@ -321,6 +324,44 @@ function ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkPosit
                     end
                 end
             end
+        end
+
+        if resourceName == "water_" then
+            local updatedTiles = {}
+
+            for tileX = chunkPosition.x, chunkPosition.x+32 do
+                for tileY = chunkPosition.y, chunkPosition.y+32 do
+                    local tile = surface.get_tile(tileX, tileY)
+                    local replacement = config.waterTile
+                    if replacement then
+                        table.insert(updatedTiles, {name = replacement, position = {tileX, tileY}})
+                    end
+                end
+            end
+
+            surface.set_tiles(updatedTiles)
+
+            -- the mangroves
+            for tileY = chunkPosition.y, chunkPosition.y+31 do
+                for tileX = chunkPosition.x, chunkPosition.x+31 do
+                    local randMangrove = Cmwc.randFraction(resource.rng)
+                    if randMangrove > 0.95 then
+                        surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
+                    elseif randMangrove > 0.5 then
+                        surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                    end
+                end
+            end
+
+            -- and the fish
+            local fish_per_chunk = 10
+            for i = 0,fish_per_chunk do
+                local fish_name = config.fishList[Cmwc.randRange(resource.rng, 1, #(config.fishList))]
+                local tileX = chunkPosition.x + Cmwc.randRange(resource.rng, 1, 31)
+                local tileY = chunkPosition.y + Cmwc.randRange(resource.rng, 1, 31)
+                surface.create_entity{name=fish_name, position={tileX,tileY}}
+            end
+            return
         end
 
         for tileY = chunkPosition.y+1, chunkPosition.y+30 do
@@ -411,7 +452,7 @@ function isOutOfMap(modSurfaceInfo, mazePosition)
     return mazePosition.y < 0 or mazePosition.x < 0 or mazePosition.x > modSurfaceInfo.maze.numColumns+1
 end
 
-function generateMangroves(modSurfaceInfo, surface, chunkTilePosition, rng)
+function generateMangroves(modSurfaceInfo, surface, chunkTilePosition, rng, config)
     if modSurfaceInfo.mazeInfo.swapXY then
         for tileY = chunkTilePosition.y+1, chunkTilePosition.y+30 do
             for tileX = chunkTilePosition.x+32, chunkTilePosition.x+33 do
@@ -498,6 +539,18 @@ function ribbonMazeChunkGeneratedEventHandler(event)
     local inClearMazeArea = isInClearMazeArea(config, modSurfaceInfo, x, y)
     local isWaterRow = y < 1
 
+    if isWaterRow then
+        -- and the fish
+        local fish_per_chunk = 10
+        local rng = modSurfaceInfo.maze.rng
+        for i = 0,fish_per_chunk do
+            local fish_name = config.fishList[Cmwc.randRange(rng, 1, #(config.fishList))]
+            local tileX = chunkTilePosition.x + Cmwc.randRange(rng, 1, 31)
+            local tileY = chunkTilePosition.y + Cmwc.randRange(rng, 1, 31)
+            surface.create_entity{name=fish_name, position={tileX,tileY}}
+        end
+    end
+
     if (isWaterRow or not inClearMazeArea) and Maze.wallTileAt(modSurfaceInfo.maze, x, y) then
         local updatedTiles = {}
         local tileName
@@ -518,7 +571,7 @@ function ribbonMazeChunkGeneratedEventHandler(event)
                 isFirstMazeWaterRowEdge(config, modSurfaceInfo, chunkTilePosition) and
                 config.terraformingPrototypesEnabled and
                 modSurfaceInfo.firstMazeRowMangroveRng[x] then
-            generateMangroves(modSurfaceInfo, surface, chunkTilePosition, modSurfaceInfo.firstMazeRowMangroveRng[x])
+            generateMangroves(modSurfaceInfo, surface, chunkTilePosition, modSurfaceInfo.firstMazeRowMangroveRng[x], config)
         elseif tileName == config.mazeWallTile then
             for tileX = chunkTilePosition.x+1, chunkTilePosition.x+29,4 do
                 for tileY = chunkTilePosition.y+1, chunkTilePosition.y+29,4 do

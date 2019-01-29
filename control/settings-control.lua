@@ -299,6 +299,11 @@ function createRibbonMazeConfig()
         table.insert(resourceMatrix[10], "uranium-ore")
     end
 
+    if settingsGlobal["ribbon-maze-water-resource"].value then
+        table.insert(resourceMatrix[8], "water_")
+        table.insert(resourceMatrix[10], "water_")
+    end
+
     local resources = {}
     local mixedResources = {}
     local forcedMixedResources = {}
@@ -310,7 +315,12 @@ function createRibbonMazeConfig()
         infiniteOres = nil
     end
 
+    local fish = {}
+
     for name,prototype in pairs(game.entity_prototypes) do
+        if prototype.type=="fish" then
+            table.insert(fish, name)
+        end
         if deadEndEnabled(settingsGlobal, name) then
 
             resources[name] = true
@@ -398,7 +408,7 @@ function createRibbonMazeConfig()
         -- Maze dimensions are calculated from the narrowist finite map size or else use the default width
         -- This default is chosen to allow a be 3 radars in width, so one radar can't reveal it all, and provide some
         -- variability
-        mazeDefaultWidthChunks = 21,
+        mazeDefaultWidthChunks = settingsGlobal["ribbon-maze-blocks"].value,
 
         -- Maximum is just some defensive programming; the maze algorithm should actually be very efficient
         mazeMaxWidthChunks = 70,
@@ -438,5 +448,11 @@ function createRibbonMazeConfig()
 
         -- Creates a clear maze of this many chunks
         clearMazeStartChunks = clearMazeStartChunks,
+
+        loopChance = settingsGlobal["ribbon-maze-loop-chance"].value,
+        clearingChance = settingsGlobal["ribbon-maze-clearing-chance"].value,
+        clearingSizeMax = settingsGlobal["ribbon-maze-clearing-size-max"].value,
+
+        fishList = fish,
     }
 end

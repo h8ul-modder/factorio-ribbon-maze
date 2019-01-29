@@ -1,5 +1,6 @@
 --[[
    Copyright 2018 H8UL
+   Modifications Copyright 2019 Illiander
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +26,7 @@
 Maze = {
 }
 
-function Maze.new(cmwcRng, numColumns, pRightWall, maxCorridorCheckDepth)
+function Maze.new(cmwcRng, numColumns, pRightWall, maxCorridorCheckDepth, loopChance, clearingChance, maxClearingSize)
 
     local numNonWallColumns = (numColumns + 1) / 2
 
@@ -37,7 +38,11 @@ function Maze.new(cmwcRng, numColumns, pRightWall, maxCorridorCheckDepth)
         pRightWall = pRightWall,
         maxCorridorCheckDepth = maxCorridorCheckDepth,
         line = {},
-        walls = {}
+        walls = {},
+        loopChance = loopChance,
+        clearingChance = clearingChance,
+        maxClearingSize = maxClearingSize,
+        clearings = {}
     }
 
     for pos = 1, numNonWallColumns do
@@ -55,12 +60,19 @@ function Maze.wallTileAt(maze, x, y)
         return true
     end
 
-    if x % 2 == 0 and y % 2 == 0 then
-        return true
-    end
-
     while y > maze.heightSoFar do
         Maze.generateMazeRow_(maze)
+    end
+
+    for _,c in pairs(maze.clearings) do
+        if x > c.pos.x and x < c.pos.x+c.size and
+                y > c.pos.y and y < c.pos.y+c.size then
+            return false
+        end
+    end
+
+    if x % 2 == 0 and y % 2 == 0 then
+        return true
     end
 
     local row = maze.walls[y]
@@ -251,7 +263,7 @@ local function sample_(set, sampleAt)
             return k
         end
     end
-    error("maze algorithm bug: attempated to sample at position " .. sampleAt .. " .. but the final position in the set was " .. pos)
+    error("maze algorithm bug: attempted to sample at position " .. sampleAt .. " .. but the final position in the set was " .. pos)
 end
 
 function Maze.generateMazeRow_(maze)
@@ -262,21 +274,23 @@ function Maze.generateMazeRow_(maze)
     for column = 1, (maze.numNonWallColumns-1) do
         local neighbour = column + 1
 
-        if maze.line[column] == maze.line[neighbour] then
-            -- add loop breaking right wall
-            rightWalls[column*2] = true
-        elseif Cmwc.randFraction(maze.rng) >= maze.pRightWall then
-            -- add right wall
-            rightWalls[column*2] = true
-        else
-            -- not adding a wall so union the sets
-            local fromCell = maze.line[neighbour]
-            local toCell = maze.line[column]
+        if  maze.loopChance == 0 or Cmwc.randFraction(maze.rng) >= maze.loopChance then
+            if maze.line[column] == maze.line[neighbour] then
+                -- add loop breaking right wall
+                rightWalls[column*2] = true
+            elseif Cmwc.randFraction(maze.rng) >= maze.pRightWall then
+                -- add right wall
+                rightWalls[column*2] = true
+            else
+                -- not adding a wall so union the sets
+                local fromCell = maze.line[neighbour]
+                local toCell = maze.line[column]
 
-            for k,present in pairs(fromCell) do
-                if present then
-                    toCell[k] = true
-                    maze.line[k] = toCell
+                for k,present in pairs(fromCell) do
+                    if present then
+                        toCell[k] = true
+                        maze.line[k] = toCell
+                    end
                 end
             end
         end
@@ -306,6 +320,16 @@ function Maze.generateMazeRow_(maze)
             sampleSize = sampleSize - 1
             setSize = setSize - 1
         end
+    end
+
+    if maze.clearingChance > 0 and Cmwc.randFraction(maze.rng) <= maze.clearingChance then
+        local size = math.floor(Cmwc.randRange(maze.rng, 2, maze.maxClearingSize))*2
+        local pos = Cmwc.randRange(maze.rng, 1, maze.numNonWallColumns)*2
+        local clearing = {
+                size = size,
+                pos = {y=maze.heightSoFar+2,x = pos}
+        }
+        table.insert(maze.clearings, clearing)
     end
 
     maze.walls[maze.heightSoFar+1] = rightWalls
