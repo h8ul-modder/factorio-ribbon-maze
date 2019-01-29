@@ -39,11 +39,16 @@ function Maze.new(cmwcRng, numColumns, pRightWall, maxCorridorCheckDepth, loopCh
         maxCorridorCheckDepth = maxCorridorCheckDepth,
         line = {},
         walls = {},
-        loopChance = loopChance,
-        clearingChance = clearingChance,
-        maxClearingSize = maxClearingSize,
-        clearings = {}
     }
+
+    if loopChance > 0 then
+        o.loopChance = loopChance
+    end
+
+    if clearingChance > 0 then
+        o.clearingChance = clearingChance
+        o.maxClearingSize = maxClearingSize
+    end
 
     for pos = 1, numNonWallColumns do
         local set = {}
@@ -64,10 +69,12 @@ function Maze.wallTileAt(maze, x, y)
         Maze.generateMazeRow_(maze)
     end
 
-    for _,c in pairs(maze.clearings) do
-        if x > c.pos.x and x < c.pos.x+c.size and
+    if maze.clearings then
+        for _,c in pairs(maze.clearings) do
+            if x > c.pos.x and x < c.pos.x+c.size and
                 y > c.pos.y and y < c.pos.y+c.size then
             return false
+            end
         end
     end
 
@@ -274,7 +281,7 @@ function Maze.generateMazeRow_(maze)
     for column = 1, (maze.numNonWallColumns-1) do
         local neighbour = column + 1
 
-        if  maze.loopChance == 0 or Cmwc.randFraction(maze.rng) >= maze.loopChance then
+        if not maze.loopChance or Cmwc.randFraction(maze.rng) >= maze.loopChance then
             if maze.line[column] == maze.line[neighbour] then
                 -- add loop breaking right wall
                 rightWalls[column*2] = true
@@ -322,13 +329,14 @@ function Maze.generateMazeRow_(maze)
         end
     end
 
-    if maze.clearingChance > 0 and Cmwc.randFraction(maze.rng) <= maze.clearingChance then
+    if maze.clearingChance and Cmwc.randFraction(maze.rng) <= maze.clearingChance then
         local size = math.floor(Cmwc.randRange(maze.rng, 2, maze.maxClearingSize))*2
         local pos = Cmwc.randRange(maze.rng, 1, maze.numNonWallColumns)*2
         local clearing = {
                 size = size,
                 pos = {y=maze.heightSoFar+2,x = pos}
         }
+        maze.clearings = maze.clearings or {}
         table.insert(maze.clearings, clearing)
     end
 
