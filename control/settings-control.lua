@@ -453,6 +453,8 @@ function createRibbonMazeConfig()
         clearingChance = settingsGlobal["ribbon-maze-clearing-chance"].value,
         clearingSizeMax = settingsGlobal["ribbon-maze-clearing-size-max"].value,
 
+        mangroveDensity = settingsGlobal["ribbon-maze-mangrove-density"].value,
+        mangroveGreenRawRatio = settingsGlobal["ribbon-maze-green-raw-ratio"].value,
         fishList = fish,
     }
 end

@@ -85,10 +85,12 @@ function mazeTerraformingResultHandler(event)
                 local tileY = position.y+templatePos[2]
                 if terraformingEdge(config, surface, tileX, tileY) then
                     local randMangrove = Cmwc.randFraction(modSurfaceInfo.terraformingMangroveRng)
-                    if randMangrove > 0.9 then
-                        surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
-                    elseif randMangrove > 0.5 then
-                        surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                    if randMangrove <= config.mangroveDensity then
+                        if config.mangroveGreenRawRatio == 1 or randMangrove <= (config.mangroveDensity * config.mangroveGreenRawRatio) then
+                            surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                        else
+                            surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
+                        end
                     end
                 end
             end

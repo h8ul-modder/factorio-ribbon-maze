@@ -345,10 +345,12 @@ function ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkPosit
             for tileY = chunkPosition.y, chunkPosition.y+31 do
                 for tileX = chunkPosition.x, chunkPosition.x+31 do
                     local randMangrove = Cmwc.randFraction(resource.rng)
-                    if randMangrove > 0.95 then
-                        surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
-                    elseif randMangrove > 0.5 then
-                        surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                    if randMangrove <= config.mangroveDensity then
+                        if config.mangroveGreenRawRatio == 1 or randMangrove <= (config.mangroveDensity * config.mangroveGreenRawRatio) then
+                            surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                        else
+                            surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
+                        end
                     end
                 end
             end
@@ -466,10 +468,12 @@ function generateMangroves(modSurfaceInfo, surface, chunkTilePosition, rng, conf
         for tileY = chunkTilePosition.y+1, chunkTilePosition.y+30 do
             for tileX = chunkTilePosition.x+30, chunkTilePosition.x+31 do
                 local randMangrove = Cmwc.randFraction(rng)
-                if randMangrove > 0.95 then
-                    surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
-                elseif randMangrove > 0.5 then
-                    surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                if randMangrove <= config.mangroveDensity then
+                    if config.mangroveGreenRawRatio == 1 or randMangrove <= (config.mangroveDensity * config.mangroveGreenRawRatio) then
+                        surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                    else
+                        surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
+                    end
                 end
             end
         end
@@ -486,10 +490,12 @@ function generateMangroves(modSurfaceInfo, surface, chunkTilePosition, rng, conf
         for tileX = chunkTilePosition.x+1, chunkTilePosition.x+30 do
             for tileY = chunkTilePosition.y+1, chunkTilePosition.y+2 do
                 local randMangrove = Cmwc.randFraction(rng)
-                if randMangrove > 0.95 then
-                    surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
-                elseif randMangrove > 0.5 then
-                    surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                if randMangrove <= config.mangroveDensity then
+                    if config.mangroveGreenRawRatio == 1 or randMangrove <= (config.mangroveDensity * config.mangroveGreenRawRatio) then
+                        surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                    else
+                        surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
+                    end
                 end
             end
         end
