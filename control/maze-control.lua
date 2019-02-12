@@ -341,15 +341,57 @@ function ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkPosit
 
             surface.set_tiles(updatedTiles)
 
+            local mangroveStartX
+            local mangroveStartY
+            local mangroveEndX
+            local mangroveEndY
+
+            if not Maze.wallTileAt(modSurfaceInfo.maze, mazePosition.x, mazePosition.y+1) then
+                if modSurfaceInfo.mazeInfo.swapXY then
+                else
+                    mangroveStartX = chunkPosition.x + 1
+                    mangroveStartY = chunkPosition.y
+                    mangroveEndX = chunkPosition.x + 30
+                    mangroveEndY = chunkPosition.y + 1
+                end
+            elseif not Maze.wallTileAt(modSurfaceInfo.maze, mazePosition.x, mazePosition.y-1) and mazePosition.y > 1 then
+                if modSurfaceInfo.mazeInfo.swapXY then
+                else
+                    mangroveStartX = chunkPosition.x + 1
+                    mangroveStartY = chunkPosition.y + 30
+                    mangroveEndX = chunkPosition.x + 30
+                    mangroveEndY = chunkPosition.y + 31
+                end
+            elseif not Maze.wallTileAt(modSurfaceInfo.maze, mazePosition.x+1, mazePosition.y) then
+                if modSurfaceInfo.mazeInfo.swapXY then
+                else
+                    mangroveStartY = chunkPosition.y + 1
+                    mangroveStartX = chunkPosition.x + 30
+                    mangroveEndY = chunkPosition.y + 30
+                    mangroveEndX = chunkPosition.x + 31
+                end
+            elseif not Maze.wallTileAt(modSurfaceInfo.maze, mazePosition.x-1, mazePosition.y) then
+                if modSurfaceInfo.mazeInfo.swapXY then
+                else
+                    mangroveStartY = chunkPosition.y + 1
+                    mangroveStartX = chunkPosition.x
+                    mangroveEndY = chunkPosition.y + 30
+                    mangroveEndX = chunkPosition.x + 1
+                end
+            end
+
             -- the mangroves
-            for tileY = chunkPosition.y, chunkPosition.y+31 do
-                for tileX = chunkPosition.x, chunkPosition.x+31 do
-                    local randMangrove = Cmwc.randFraction(resource.rng)
-                    if randMangrove <= config.mangroveDensity then
-                        if config.mangroveGreenRawRatio == 1 or randMangrove <= (config.mangroveDensity * config.mangroveGreenRawRatio) then
-                            surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
-                        else
-                            surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
+            if mangroveStartX then
+
+                for tileY = mangroveStartY, mangroveEndY do
+                    for tileX = mangroveStartX, mangroveEndX do
+                        local randMangrove = Cmwc.randFraction(resource.rng)
+                        if randMangrove <= config.mangroveDensity then
+                            if config.mangroveGreenRawRatio == 1 or randMangrove <= (config.mangroveDensity * config.mangroveGreenRawRatio) then
+                                surface.create_entity{name="mangrove-avicennia", position={tileX,tileY}}
+                            else
+                                surface.create_entity{name="mangrove-bruguiera", position={tileX,tileY}}
+                            end
                         end
                     end
                 end
@@ -577,7 +619,11 @@ function ribbonMazeChunkGeneratedEventHandler(event)
                 isFirstMazeWaterRowEdge(config, modSurfaceInfo, chunkTilePosition) and
                 config.terraformingPrototypesEnabled and
                 modSurfaceInfo.firstMazeRowMangroveRng[x] then
-            generateMangroves(modSurfaceInfo, surface, chunkTilePosition, modSurfaceInfo.firstMazeRowMangroveRng[x], config)
+
+            local resourceAbove = resourceAt(config, surface, modSurfaceInfo, {x=x, y=y+1})
+            if resourceAbove == nil or resourceAbove.resourceName ~= "water_" then
+                generateMangroves(modSurfaceInfo, surface, chunkTilePosition, modSurfaceInfo.firstMazeRowMangroveRng[x], config)
+            end
         elseif tileName == config.mazeWallTile then
             for tileX = chunkTilePosition.x+1, chunkTilePosition.x+29,4 do
                 for tileY = chunkTilePosition.y+1, chunkTilePosition.y+29,4 do
