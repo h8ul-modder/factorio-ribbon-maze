@@ -29,7 +29,7 @@ data:extend {
         always_show_made_in = true,
         ingredients =
         {
-            {"raw-wood", 10},
+            {"wood", 10},
         },
         results = {
             {type="item", name="composting-greens", amount=1},
@@ -39,7 +39,7 @@ data:extend {
         subgroup = "intermediate-product",
         icons = {
             {
-                icon = "__base__/graphics/icons/raw-wood.png",
+                icon = "__base__/graphics/icons/wood.png",
                 icon_size = 32,
             },
             {
@@ -68,7 +68,7 @@ data:extend {
         subgroup = "intermediate-product",
         icons = {
             {
-                icon = "__base__/graphics/icons/raw-wood.png",
+                icon = "__base__/graphics/icons/wood.png",
                 icon_size = 32,
                 tint = {r=0.41, g=0.8, b=0.41, a=1.0},
             },

@@ -29,19 +29,19 @@ data:extend {{
     ingredients = {
         {"green-wood", 1}
     },
-    result= "raw-wood",
+    result= "wood",
     subgroup="raw-material",
     always_show_made_in = true,
     main_product = "",
     icons = {
         {
-            icon = "__base__/graphics/icons/raw-wood.png",
+            icon = "__base__/graphics/icons/wood.png",
             icon_size = 32,
             shift = {-3, -3},
             tint = {r=0.41, g=0.8, b=0.41, a=1.0},
         },
         {
-            icon = "__base__/graphics/icons/raw-wood.png",
+            icon = "__base__/graphics/icons/wood.png",
             icon_size = 32,
             shift = {3, 3},
         }

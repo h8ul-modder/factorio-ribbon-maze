@@ -30,13 +30,13 @@ data:extend {{
             icon_size = 32,
         },
         {
-            icon = "__base__/graphics/icons/raw-wood.png",
+            icon = "__base__/graphics/icons/wood.png",
             shift = {3, 3},
             icon_size = 32,
             tint = {r=0.41, g=0.8, b=0.41, a=0.5},
         }
     },
-    flags = {"goes-to-quickbar"},
+    flags = {},
     subgroup = "extraction-machine",
     order = "a[items]-b[mangrove-harvester]",
     place_result = "mangrove-harvester",

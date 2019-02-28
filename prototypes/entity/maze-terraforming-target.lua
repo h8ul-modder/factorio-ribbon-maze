@@ -24,12 +24,12 @@ data:extend{
     {
         type = "simple-entity-with-force",
         name = "maze-terraforming-target",
-        icon = "__base__/graphics/icons/stone-wall.png",
+        icon = "__base__/graphics/icons/wall.png",
         picture = {
             filename = "__base__/graphics/entity/pipe/hr-pipe-cross.png",
             priority = "extra-high",
-            width = 0,
-            height = 0,
+            width = 128,
+            height = 128,
         },
         icon_size = 32,
         collision_mask = {"object-layer"},

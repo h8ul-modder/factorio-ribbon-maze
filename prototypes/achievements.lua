@@ -44,7 +44,7 @@ data:extend{
         type = "produce-per-hour-achievement",
         name = "feller-buncher",
         order = "aa[production]-b[feller-buncher]",
-        item_product = "raw-wood",
+        item_product = "wood",
         amount = 1000,
         icons = {
             {
