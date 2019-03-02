@@ -28,8 +28,8 @@ data:extend{
         picture = {
             filename = "__base__/graphics/entity/pipe/hr-pipe-cross.png",
             priority = "extra-high",
-            width = 128,
-            height = 128,
+            width = 1,
+            height = 1,
         },
         icon_size = 32,
         collision_mask = {"object-layer"},
