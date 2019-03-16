@@ -84,7 +84,7 @@ data:extend {{
     tree_removal_max_distance = 1,
     minable = {
         mining_time = 10,
-        result = "raw-wood",
+        result = "wood",
         count = 1,
         mining_particle = "wooden-particle",
         hardness = 0.5
@@ -94,8 +94,8 @@ data:extend {{
         sheet = {
             filename = "__base__/graphics/entity/tree/green-coral/green-coral-06.png",
             priority = "extra-high",
-            width = 77,
-            height = 97,
+            width = 67,
+            height = 71,
             frame_count = 1,
             variation_count = 1
         }

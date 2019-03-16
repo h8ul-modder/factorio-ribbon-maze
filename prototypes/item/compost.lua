@@ -25,7 +25,7 @@ data:extend{{
     name = "compost",
     icon = "__RibbonMaze__/graphics/icons/compost.png",
     icon_size = 32,
-    flags = {"goes-to-main-inventory"},
+    flags = {},
     subgroup = "intermediate-product",
     order = "o[compost]",
     stack_size = 500
