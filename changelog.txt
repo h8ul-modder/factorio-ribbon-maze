@@ -1,8 +1,10 @@
-Version 0.7.0
+Version: 0.7.0
 ---------------------------------------------------------------------------------------------------
 Date: 16. 03. 2019
   Features:
     - Experimental support for factorio 0.17 alpha
+  Bugfixes:
+    - Maximum clearing size was missing description in english locale
 ---------------------------------------------------------------------------------------------------
 Version: 0.6.8
 Date: 29. 01. 2019
