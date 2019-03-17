@@ -1,8 +1,10 @@
-Version: 0.7.0
 ---------------------------------------------------------------------------------------------------
+Version: 0.7.0
 Date: 16. 03. 2019
   Features:
     - Experimental support for factorio 0.17 alpha
+  Balance:
+    - Minimum dead end depth for Jivolite and Crotinnium reduced from 6 to 4 (angel's refining)
   Bugfixes:
     - Maximum clearing size was missing description in english locale
 ---------------------------------------------------------------------------------------------------

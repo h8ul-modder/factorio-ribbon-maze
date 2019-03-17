@@ -184,9 +184,9 @@ resourceCorridorDepths["ground-water"] = {6,8}
 resourceCorridorDepths["lithia_water"] = {6,8}
 -- angel's refining:
 resourceCorridorDepths["angels-ore1"] = {2,4,6,8,10}
-resourceCorridorDepths["angels-ore2"] = {6,8,10}
+resourceCorridorDepths["angels-ore2"] = {4,6,8,10}
 resourceCorridorDepths["angels-ore3"] = {2,4,6,8,10}
-resourceCorridorDepths["angels-ore4"] = {6,8,10}
+resourceCorridorDepths["angels-ore4"] = {4,6,8,10}
 resourceCorridorDepths["angels-ore5"] = {2,4,6,8,10}
 resourceCorridorDepths["angels-ore6"] = {2,4,6,8,10}
 -- yuoki industries:
