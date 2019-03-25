@@ -455,6 +455,8 @@ function createRibbonMazeConfig()
 
         mangroveDensity = settingsGlobal["ribbon-maze-mangrove-density"].value,
         mangroveGreenRawRatio = settingsGlobal["ribbon-maze-green-raw-ratio"].value,
+
+        fishPerChunk = 10,
         fishList = fish,
     }
 end

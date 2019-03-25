@@ -245,13 +245,12 @@ local function initModSurfaceInfo(config, surface, modSurfaceInfo)
 
     modSurfaceInfo.mazeStartCoordinates = calculateMazePosition(config, modSurfaceInfo, {x = 0, y = 0})
 
-    if config.terraformingPrototypesEnabled then
-        local mangroveRng = Cmwc.deriveNew(modSurfaceInfo.masterRng)
-        modSurfaceInfo.terraformingMangroveRng = Cmwc.deriveNew(mangroveRng)
-        modSurfaceInfo.firstMazeRowMangroveRng = {}
-        for i = 1,chunks do
-            table.insert(modSurfaceInfo.firstMazeRowMangroveRng, Cmwc.deriveNew(mangroveRng))
-        end
+    local mangroveRng = Cmwc.deriveNew(modSurfaceInfo.masterRng)
+    modSurfaceInfo.terraformingMangroveRng = Cmwc.deriveNew(mangroveRng)
+    -- this RNG is used for fish in the first row, too:
+    modSurfaceInfo.firstMazeRowMangroveRng = {}
+    for i = 1,chunks do
+        table.insert(modSurfaceInfo.firstMazeRowMangroveRng, Cmwc.deriveNew(mangroveRng))
     end
 
     modSurfaceInfo.firstResource = {}
@@ -261,6 +260,17 @@ local function initModSurfaceInfo(config, surface, modSurfaceInfo)
     end
 
     modSurfaceInfo.initComplete = true
+end
+
+local function generateFish(config, surface, chunkPosition, rng)
+    if rng then
+        for i = 0, config.fishPerChunk do
+            local fishName = config.fishList[Cmwc.randRange(rng, 1, #(config.fishList))]
+            local tileX = chunkPosition.x + Cmwc.randRange(rng, 1, 31)
+            local tileY = chunkPosition.y + Cmwc.randRange(rng, 1, 31)
+            surface.create_entity{name=fishName, position={tileX,tileY}}
+        end
+    end
 end
 
 function ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkPosition, mazePosition)
@@ -356,13 +366,7 @@ function ribbonMazeGenerateResources(config, modSurfaceInfo, surface, chunkPosit
             end
 
             -- and the fish
-            local fish_per_chunk = 10
-            for i = 0,fish_per_chunk do
-                local fish_name = config.fishList[Cmwc.randRange(resource.rng, 1, #(config.fishList))]
-                local tileX = chunkPosition.x + Cmwc.randRange(resource.rng, 1, 31)
-                local tileY = chunkPosition.y + Cmwc.randRange(resource.rng, 1, 31)
-                surface.create_entity{name=fish_name, position={tileX,tileY}}
-            end
+            generateFish(config, surface, chunkPosition, resource.rng)
             return
         end
 
@@ -546,15 +550,8 @@ function ribbonMazeChunkGeneratedEventHandler(event)
     local isWaterRow = y < 1
 
     if isWaterRow then
-        -- and the fish
-        local fish_per_chunk = 10
-        local rng = modSurfaceInfo.maze.rng
-        for i = 0,fish_per_chunk do
-            local fish_name = config.fishList[Cmwc.randRange(rng, 1, #(config.fishList))]
-            local tileX = chunkTilePosition.x + Cmwc.randRange(rng, 1, 31)
-            local tileY = chunkTilePosition.y + Cmwc.randRange(rng, 1, 31)
-            surface.create_entity{name=fish_name, position={tileX,tileY}}
-        end
+        -- generate fish in the first row
+        generateFish(config, surface, chunkTilePosition, modSurfaceInfo.firstMazeRowMangroveRng[x])
     end
 
     if (isWaterRow or not inClearMazeArea) and Maze.wallTileAt(modSurfaceInfo.maze, x, y) then
