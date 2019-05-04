@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.7.2
+Date: 04. 05. 2019
+  Changes:
+    - Updates to breaking changes in 0.17.35
+    - Minimum base version is now 0.17.35
+  Bugfixes:
+    - Fix that in 0.17 maze terraforming artillery no longer target the maze chasm
+---------------------------------------------------------------------------------------------------
 Version: 0.7.1
 Date: 25. 03. 2019
   Bugfixes:
