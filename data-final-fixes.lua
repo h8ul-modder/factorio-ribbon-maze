@@ -20,27 +20,13 @@
    SOFTWARE.
 --]]
 
-data:extend{
-    {
-        type = "simple-entity-with-force",
-        name = "maze-terraforming-target",
-        icon = "__base__/graphics/icons/wall.png",
-        picture = {
-            filename = "__base__/graphics/entity/pipe/hr-pipe-cross.png",
-            priority = "extra-high",
-            width = 1,
-            height = 1,
-        },
-        icon_size = 32,
-        collision_mask = {"object-layer"},
-        collision_box = {{-0, -0}, {0, 0}},
-        selection_box = {{-1, -1}, {2.9, 2.9}},
-        shooting_cursor_size = 2,
-        flags = {"not-flammable", "not-repairable", "not-on-map", "not-blueprintable", "not-deconstructable", "not-rotatable"},
-        allow_copy_paste = false,
-        minable = nil,
-        max_health = 100000,
-        corpse = nil,
-        resistances = {}
-    },
-}
+local mazeTerraformingTarget = data.raw["simple-entity-with-force"]["maze-terraforming-target"]
+
+log("adding damage type resistances to maze-terraforming-target")
+
+for _,damageType in pairs(data.raw["damage-type"]) do
+    table.insert(mazeTerraformingTarget.resistances, {
+        type = damageType.name,
+        percent = 100
+    })
+end
