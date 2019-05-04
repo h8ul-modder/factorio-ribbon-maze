@@ -625,7 +625,7 @@ function ribbonMazePlayerCreatedEventHander(event)
 
     if config.clearMazeStartChunks <= 0 then
 
-        local teleportPosition = surface.find_non_colliding_position("player", {x = 16, y = 16}, 16, 1)
+        local teleportPosition = surface.find_non_colliding_position("character", {x = 16, y = 16}, 16, 1)
         if teleportPosition then
             player.teleport(teleportPosition, surface)
         else

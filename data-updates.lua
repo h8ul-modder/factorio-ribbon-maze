@@ -25,4 +25,4 @@ require('prototypes.recipe.update-landfill')
 require('prototypes.technology.update-landfill')
 
 -- Allow players to hand-mine mangrove trees
-table.insert(data.raw.player["player"].mining_categories, "mangrove")
+table.insert(data.raw.character["character"].mining_categories, "mangrove")

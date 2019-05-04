@@ -6,6 +6,6 @@
   "contact": "h8ul.mods@gmail.com",
   "homepage": "https://mods.factorio.com/user/h8ul",
   "factorio_version": "0.17",
-  "dependencies": ["base"],
+  "dependencies": ["base >= 0.17.35"],
   "description": "The maze itself is destined to be automated."
 }
