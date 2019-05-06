@@ -35,8 +35,20 @@
 Cmwc = {
 }
 
+-- Multiplication behaves differently on Windows and Linux so we have to emulate 32-bit multiplication
+local function mul32(a, b)
+    a = bit32.band(a, 0xffffffff);
+    b = bit32.band(b, 0xffffffff);
+    local ah = bit32.rshift(a, 16);
+    local bh = bit32.rshift(b, 16);
+    local al = bit32.band(a, 0xffff);
+    local bl = bit32.band(b, 0xffff);
+    local high = bit32.band((ah * bl) + (al * bh), 0xffff);
+    return bit32.band((high * 0x10000) + (al * bl), 0xffffffff);
+end
+
 local function lcg(s)
-    return bit32.rshift(1664525*s+1013904223, 0xffffffff)
+    return bit32.rshift(mul32(1664525,s)+1013904223, 0xffffffff)
 end
 
 local function rngFactory(seed1, seed2, seed3, seed4)
@@ -100,7 +112,7 @@ end
 -- Generate a random integer in the range [0, 2^32-1]
 function Cmwc.randUint32(rng)
     rng.i = bit32.band(rng.i + 1, 3)
-    local t = (987654978 * rng.Q[rng.i+1]) + rng.c
+    local t = (mul32(987654978, rng.Q[rng.i+1])) + rng.c
     rng.c = bit32.rshift(t, 32)
     local x = bit32.band(t + rng.c, 0xffffffff)
     if x < rng.c then
