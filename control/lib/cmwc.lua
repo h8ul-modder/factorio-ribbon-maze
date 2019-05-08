@@ -48,7 +48,7 @@ local function mul32(a, b)
 end
 
 local function lcg(s)
-    return bit32.rshift(mul32(1664525,s)+1013904223, 0xffffffff)
+    return bit32.band(mul32(1664525,s)+1013904223, 0xffffffff)
 end
 
 local function rngFactory(seed1, seed2, seed3, seed4)
