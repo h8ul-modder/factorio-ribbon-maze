@@ -112,7 +112,7 @@ end
 -- Generate a random integer in the range [0, 2^32-1]
 function Cmwc.randUint32(rng)
     rng.i = bit32.band(rng.i + 1, 3)
-    local t = (mul32(987654978, rng.Q[rng.i+1])) + rng.c
+    local t = (987654978 * rng.Q[rng.i+1]) + rng.c
     rng.c = bit32.rshift(t, 32)
     local x = bit32.band(t + rng.c, 0xffffffff)
     if x < rng.c then

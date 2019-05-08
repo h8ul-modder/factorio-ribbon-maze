@@ -59,6 +59,29 @@ function Maze.new(cmwcRng, numColumns, pRightWall, maxCorridorCheckDepth, loopCh
     return o
 end
 
+function Maze.shrink(maze, newHeight)
+
+    if newHeight >= maze.heightSoFar then
+        return
+    end
+
+    for pos = 1, maze.numNonWallColumns do
+        local set = {}
+        set[pos] = true
+        maze.line[pos] = set
+    end
+
+    for y = newHeight + 3, maze.heightSoFar do
+        maze.walls[y] = nil
+    end
+    maze.heightSoFar = newHeight
+--
+--    for y = 0, maze.heightSoFar do
+--        Maze.regenerateMazeRow_(maze, y)
+--    end
+
+end
+
 function Maze.wallTileAt(maze, x, y)
 
     if y < 1 or x < 1 or x > maze.numColumns then
@@ -343,4 +366,36 @@ function Maze.generateMazeRow_(maze)
     maze.walls[maze.heightSoFar+1] = rightWalls
     maze.walls[maze.heightSoFar+2] = topWalls
     maze.heightSoFar = maze.heightSoFar + 2
+end
+
+function Maze.regenerateMazeRow_(maze, row)
+
+    local rightWalls = maze.walls[row+1]
+    local topWalls = maze.walls[row+2]
+
+    for column = 1, (maze.numNonWallColumns-1) do
+        local neighbour = column + 1
+
+        if not rightWalls[column*2] then
+            -- no wall so union the sets
+            local fromCell = maze.line[neighbour]
+            local toCell = maze.line[column]
+
+            for k,present in pairs(fromCell) do
+                if present then
+                    toCell[k] = true
+                    maze.line[k] = toCell
+                end
+            end
+        end
+    end
+
+    for column = 1, (maze.numNonWallColumns-1) do
+        if topWalls[column*2] then
+            -- wall above so start new set
+            local newSet = {}
+            newSet[column] = true
+            maze.line[column] = newSet
+        end
+    end
 end

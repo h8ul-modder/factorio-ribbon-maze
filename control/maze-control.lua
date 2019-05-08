@@ -683,6 +683,84 @@ function ribbonMazeResourceFinishedEventHandler(event)
     end
 end
 
+local function findPlayerForces()
+    local playerForces = {}
+    for _, player in pairs(game.players) do
+        table.insert(playerForces, player.force.name)
+    end
+    return playerForces
+end
+
+local function chartedChunk(surface, chunk, playerForces)
+
+    for _, force in pairs(playerForces) do
+        if game.forces[force].is_chunk_charted(surface, chunk) then
+            return true
+        end
+    end
+
+    return false
+end
+
+function regenerateMaze(commandInfo)
+    local config = ribbonMazeConfig()
+    local playerForces = findPlayerForces()
+    for _, surfaceName in pairs(config.modSurfaces) do
+        local modSurfaceInfo = global.modSurfaceInfo[surfaceName]
+        local surface = game.surfaces[surfaceName]
+        modSurfaceInfo.masterRng = Cmwc.withSeed(Cmwc.randUint32(modSurfaceInfo.masterRng) + surface.map_gen_settings.seed)
+        modSurfaceInfo.terraformingMangroveRng = Cmwc.deriveNew(modSurfaceInfo.masterRng)
+        modSurfaceInfo.resourceGridRng = Cmwc.deriveNew(modSurfaceInfo.masterRng)
+        modSurfaceInfo.maze.rng = Cmwc.deriveNew(modSurfaceInfo.masterRng)
+
+        local oldHeight = modSurfaceInfo.maze.heightSoFar
+        local newHeight = oldHeight
+        for row = oldHeight,1,-1 do
+
+            local unchartedRow = true
+            for column = 1, (modSurfaceInfo.maze.numColumns) do
+                local chunkXY = calculateChunkPositionFromMazeCoordinates(config, modSurfaceInfo, {x=column, y=row})
+                local chunkPos = {x = math.floor(chunkXY.x / 32), y = math.floor(chunkXY.y / 32)}
+
+                if chartedChunk(surface, chunkPos, playerForces) then
+                    unchartedRow = false
+                    break
+                end
+            end
+
+            if unchartedRow then
+                newHeight = row - 1
+            end
+        end
+        newHeight = math.floor(newHeight / 2) * 2
+
+        if newHeight < oldHeight then
+            game.print("regenerating rows from " .. newHeight .. " to " .. oldHeight)
+
+            Maze.shrink(modSurfaceInfo.maze, newHeight)
+
+            for row = newHeight,oldHeight do
+                for column = 0, (modSurfaceInfo.maze.numColumns + 1) do
+                    local chunkXY = calculateChunkPositionFromMazeCoordinates(config, modSurfaceInfo, {x=column, y=row})
+                    local chunkPos = {x = math.floor(chunkXY.x / 32), y = math.floor(chunkXY.y / 32)}
+                    surface.delete_chunk(chunkPos)
+                end
+            end
+        end
+    end
+end
+
+function unchart(commandInfo)
+    local surface = game.player.surface;
+    game.player.force.cancel_charting(surface);
+    local chunk_radius = 3;
+    for chunk in surface.get_chunks() do
+        if (chunk.x < -chunk_radius or chunk.x > chunk_radius or chunk.y < -chunk_radius or chunk.y > chunk_radius) then
+            game.player.force.unchart_chunk(chunk, surface)
+        end
+    end
+end
+
 function ribbonMazeInitHandler()
 
     local config = ribbonMazeConfig()

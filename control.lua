@@ -52,6 +52,9 @@ script.on_event(defines.events.on_trigger_created_entity, mazeTerraformingResult
 -- Custom commands  --
 ----------------------
 
+-- TODO commands are a work in progress
+--commands.add_command("regenerateMaze", "Regenerate Maze", regenerateMaze)
+--commands.add_command("unchart", "unchart", unchart)
 
 ------------------------------------------------------------------------------------------
 -- control.lua runtime "migrations" i.e. ones not suited to builtin factorio migrations --
