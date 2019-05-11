@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.7.6
+Date: 11. 05. 2019
+  Changes:
+    - Minimum base version is now 0.17.38 to enforce fix to platform bit handling differences
+  Bugfixes:
+    - Had "tin" instead of "tin-ore" for bob's ores
+---------------------------------------------------------------------------------------------------
 Version: 0.7.5
 Date: 08. 05. 2019
   Bugfixes:
