@@ -38,7 +38,7 @@ data:extend {{
     },
     subgroup = "intermediate-product",
     icons = {{
-        icon = "__RibbonMaze__/graphics/icons/compost.png",
+        icon = "__RibbonMaze018__/graphics/icons/compost.png",
         icon_size = 32,
     }},
     crafting_machine_tint =

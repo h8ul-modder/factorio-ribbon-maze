@@ -24,7 +24,7 @@ data:extend{{
     type = "technology",
     name = "wood-kiln-drying",
     icon_size = 128,
-    icon = "__RibbonMaze__/graphics/technology/wood-kiln-drying.png",
+    icon = "__RibbonMaze018__/graphics/technology/wood-kiln-drying.png",
     effects =
     {
         {

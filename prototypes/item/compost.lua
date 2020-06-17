@@ -23,7 +23,7 @@
 data:extend{{
     type = "item",
     name = "compost",
-    icon = "__RibbonMaze__/graphics/icons/compost.png",
+    icon = "__RibbonMaze018__/graphics/icons/compost.png",
     icon_size = 32,
     flags = {},
     subgroup = "intermediate-product",

@@ -29,7 +29,7 @@ data:extend{{
             icon_size = 128
         },
         {
-            icon = "__RibbonMaze__/graphics/technology/resource-scanning.png",
+            icon = "__RibbonMaze018__/graphics/technology/resource-scanning.png",
             icon_size = 128
         }
     },

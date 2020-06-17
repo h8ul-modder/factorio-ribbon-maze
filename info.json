@@ -1,11 +1,11 @@
 {
-  "name": "RibbonMaze",
-  "version": "0.8.0",
-  "title": "Ribbon Maze",
+  "name": "RibbonMaze018",
+  "version": "0.8.1",
+  "title": "Ribbon Maze (fix for 0.18)",
   "author": "H8UL",
   "contact": "h8ul.mods@gmail.com",
   "homepage": "https://mods.factorio.com/user/h8ul",
   "factorio_version": "0.18",
   "dependencies": ["base >= 0.17.38"],
-  "description": "The maze itself is destined to be automated."
+  "description": "The maze itself is destined to be automated. Fixed for 0.18 by kajacx."
 }

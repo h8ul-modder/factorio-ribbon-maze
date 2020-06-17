@@ -43,7 +43,7 @@ data:extend {
                 icon_size = 32,
             },
             {
-                icon = "__RibbonMaze__/graphics/icons/compost-shredding.png",
+                icon = "__RibbonMaze018__/graphics/icons/compost-shredding.png",
                 icon_size = 32,
             },
         },
@@ -73,7 +73,7 @@ data:extend {
                 tint = {r=0.41, g=0.8, b=0.41, a=1.0},
             },
             {
-                icon = "__RibbonMaze__/graphics/icons/compost-shredding.png",
+                icon = "__RibbonMaze018__/graphics/icons/compost-shredding.png",
                 icon_size = 32,
             },
         },
@@ -101,7 +101,7 @@ data:extend {
                 icon_size = 32,
             },
             {
-                icon = "__RibbonMaze__/graphics/icons/compost-shredding.png",
+                icon = "__RibbonMaze018__/graphics/icons/compost-shredding.png",
                 icon_size = 32,
             },
         },
@@ -129,7 +129,7 @@ data:extend {
                 icon_size = 32,
             },
             {
-                icon = "__RibbonMaze__/graphics/icons/compost-shredding.png",
+                icon = "__RibbonMaze018__/graphics/icons/compost-shredding.png",
                 icon_size = 32,
             },
         },
@@ -157,7 +157,7 @@ data:extend {
                 icon_size = 32,
             },
             {
-                icon = "__RibbonMaze__/graphics/icons/compost-shredding.png",
+                icon = "__RibbonMaze018__/graphics/icons/compost-shredding.png",
                 icon_size = 32,
             },
         },
@@ -185,7 +185,7 @@ data:extend {
                 icon_size = 32,
             },
             {
-                icon = "__RibbonMaze__/graphics/icons/compost-shredding.png",
+                icon = "__RibbonMaze018__/graphics/icons/compost-shredding.png",
                 icon_size = 32,
             },
         },
