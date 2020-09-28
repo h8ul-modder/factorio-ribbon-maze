@@ -34,6 +34,8 @@ local function convertToMazeTile(mazeTile)
         "doodad-layer"
     }
 
+    mazeTile.effect_color = {0.02, 0.02, 0.02}
+
     mazeTile.variants =
     {
         main =
