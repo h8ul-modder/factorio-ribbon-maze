@@ -26,7 +26,7 @@ data:extend{{
     icon_size = 128,
     icons = {
         {
-            icon = "__base__/graphics/technology/tanks.png",
+            icon = "__base__/graphics/technology/tank.png",
         },
         {
             icon = "__RibbonMaze018__/graphics/technology/mangrove-harvesting.png",
@@ -39,7 +39,7 @@ data:extend{{
             recipe = "mangrove-harvester"
         }
     },
-    prerequisites = {"tanks", "wood-kiln-drying"},
+    prerequisites = {"tank", "wood-kiln-drying"},
     unit =
     {
         count = 100,
