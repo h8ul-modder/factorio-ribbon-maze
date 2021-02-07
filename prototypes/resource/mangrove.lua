@@ -50,7 +50,7 @@ data:extend {{
     stage_counts = {0},
     stages = {
         sheet = {
-            filename = "__base__/graphics/entity/tree/green-coral/green-coral-01.png",
+            filename = "__RibbonMaze018__/graphics/entity/green-coral-01.png",
             priority = "extra-high",
             width = 58,
             height = 69,
@@ -92,7 +92,7 @@ data:extend {{
     stage_counts = {0},
     stages = {
         sheet = {
-            filename = "__base__/graphics/entity/tree/green-coral/green-coral-06.png",
+            filename = "__RibbonMaze018__/graphics/entity/green-coral-06.png",
             priority = "extra-high",
             width = 67,
             height = 71,

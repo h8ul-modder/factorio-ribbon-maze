@@ -24,7 +24,7 @@ data:extend{{
     type = "technology",
     name = "in-vessel-composting",
     icon_size = 128,
-    icon = "__RibbonMaze__/graphics/technology/in-vessel-composting.png",
+    icon = "__RibbonMaze018__/graphics/technology/in-vessel-composting.png",
     effects =
     {
         {

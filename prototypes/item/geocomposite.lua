@@ -25,11 +25,11 @@ data:extend{{
     name = "geocomposite",
     icons = {
         {
-            icon = "__RibbonMaze__/graphics/icons/geocomposite-background.png",
+            icon = "__RibbonMaze018__/graphics/icons/geocomposite-background.png",
             icon_size = 32,
         },
         {
-            icon = "__base__/graphics/icons/rocket-structure.png",
+            icon = "__RibbonMaze018__/graphics/icons/rocket-structure.png",
             icon_size = 32,
             tint = {r=0, g=0, b=0, a=1},
         }

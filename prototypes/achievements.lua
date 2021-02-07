@@ -34,7 +34,7 @@ data:extend{
                 tint = {r=0, b=1, g=0, a=0.8}
             },
             {
-                icon = "__RibbonMaze__/graphics/achievements/terraforming.png",
+                icon = "__RibbonMaze018__/graphics/achievements/terraforming.png",
                 icon_size = 128,
             },
         },
@@ -48,7 +48,7 @@ data:extend{
         amount = 1000,
         icons = {
             {
-                icon = "__RibbonMaze__/graphics/achievements/waterworld.png",
+                icon = "__RibbonMaze018__/graphics/achievements/waterworld.png",
                 icon_size = 128,
             },
             {
